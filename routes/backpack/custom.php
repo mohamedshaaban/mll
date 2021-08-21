@@ -22,6 +22,15 @@ Route::group([
     Route::crud('icon', 'IconCrudController');
     Route::crud('product', 'ProductCrudController');
     Route::crud('dummy', 'DummyCrudController');
+    Route::crud('areas', 'AreasCrudController');
+    Route::crud('cars', 'CarsCrudController');
+    Route::crud('cartypes', 'CarTypesCrudController');
+    Route::crud('requeststatus', 'RequestStatusCrudController');
+    Route::crud('customers', 'CustomersCrudController');
+    Route::crud('orders', 'OrdersCrudController');
+    Route::crud('comissions', 'ComissionsCrudController');
+    Route::post('fetch/areas', 'AreasCrudController@fetch');
+    Route::crud('user', 'UserCrudController');
 
     // ------------------
     // AJAX Chart Widgets
