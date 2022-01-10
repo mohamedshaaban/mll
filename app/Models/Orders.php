@@ -27,7 +27,7 @@ class Orders extends Model
     protected $appends = ['comission_paid_status','paid_status','invoice_id','paymenttext'];
     protected $primaryKey = 'id';
     protected $fillable = ['invoice_unique_id', 'customer_id','car_id','area_from','area_to','driver_id','status','address','paid_by',
-    'comission','comission_paid','commission_date_paid','date','time','amount','xero_id','payment_type','link_generated','is_paid','payment_link','url','order_collected','collected_date','car_make','car_model','partially_paid','remarks'];
+    'comission','comission_paid','commission_date_paid','date','time','amount','discount','xero_id','payment_type','link_generated','is_paid','payment_link','url','order_collected','collected_date','car_make','car_model','partially_paid','remarks'];
     public function customers()
     {
         return $this->belongsTo(Customers::class, 'customer_id');

@@ -16,6 +16,7 @@ return array(
     'AddCommissionPaidDate' => $baseDir . '/database/migrations/2021_09_06_070928_add_commission_paid_date.php',
     'AddCommissionTableOrder' => $baseDir . '/database/migrations/2021_09_06_135026_add_commission_table_order.php',
     'AddDateFromToCustomerInvoicces' => $baseDir . '/database/migrations/2021_08_26_132918_add_date_from_to_customer_invoicces.php',
+    'AddDiscountOrdersTable' => $baseDir . '/database/migrations/2022_01_10_124134_add_discount_orders_table.php',
     'AddFieldsUser' => $baseDir . '/database/migrations/2021_08_21_135938_add_fields_user.php',
     'AddInvoiceIdPaymentTran' => $baseDir . '/database/migrations/2021_09_02_130035_add_invoice_id_payment_tran.php',
     'AddInvoiceUniqueIdTableInvoices' => $baseDir . '/database/migrations/2021_09_12_100604_add_invoice_unique_id_table_invoices.php',

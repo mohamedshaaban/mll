@@ -697,6 +697,15 @@ class OrdersCrudController extends CrudController
 
             ]);
             CRUD::addField([ // Text
+                'name' => 'discount',
+                'label' => trans('admin.discount'),
+                'type' => 'text',
+                'tab' => 'Texts',
+                'default' => 0
+
+
+            ]);
+            CRUD::addField([ // Text
                 'name' => 'comission',
                 'label' => trans('admin.Comission'),
                 'type' => 'text',
@@ -1036,6 +1045,17 @@ class OrdersCrudController extends CrudController
             CRUD::addField([ // Text
                 'name' => 'amount',
                 'label' => trans('admin.Amount'),
+                'type' => 'text',
+                'tab' => 'Texts',
+                'default' => 0,
+                'attributes' => [
+                    'disabled' => 'disabled',
+                ],
+
+            ]);
+            CRUD::addField([ // Text
+                'name' => 'discount',
+                'label' => trans('admin.discount'),
                 'type' => 'text',
                 'tab' => 'Texts',
                 'default' => 0,

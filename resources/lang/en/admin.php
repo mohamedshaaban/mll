@@ -170,7 +170,15 @@ return array(
     'remarks'=>'Remarks',
     'total_amount'=>'Total Amount',
     'MLL EMERGENCY ROADSIDE ASSISTANCE'=>'MLL EMERGENCY ROADSIDE ASSISTANCE',
-    'Share'=>'Share'
+    'Share'=>'Share',
+    'discount'=>'Discount',
+    ''=>'',
+    ''=>'',
+    ''=>'',
+    ''=>'',
+    ''=>'',
+    ''=>'',
+    ''=>'',
 
 
 );

@@ -24,8 +24,10 @@ class OrdersRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
     {
         return [
             'customer_id'        => 'required',
+            'driver_id'        => 'required',
             'amount'        => 'numeric|min:0',
             'comission'        => 'numeric|nullable|min:0|lte:amount',
+            'discount'        => 'numeric|nullable|min:0|lte:amount',
 //            'amount'        => 'required',
 
 
