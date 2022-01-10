@@ -41,6 +41,27 @@ class OrdersCollectedCrudController extends CrudController
 
             }
         }
+        $this->crud->addFilter([
+            'name'        => 'datefrom',
+            'type'        => 'date',
+            'label'       => trans('admin.Date From'),
+            'placeholder' => trans('admin.Pick a date')
+        ],
+            false,
+            function ($value) { // if the filter is active, apply these constraints
+            session(['searchDateFrom'=>$value]);
+            });
+        $this->crud->addFilter([
+            'name'        => 'dateto',
+            'type'        => 'date',
+            'label'       => trans('admin.Date To'),
+            'placeholder' => trans('admin.Pick a date')
+        ],
+            false,
+            function ($value) { // if the filter is active, apply these constraints
+            session(['searchDateTo'=>$value]);
+            });
+
          $this->crud->addClause('where','is_driver', '=', '1');
 //        $this->crud->addClause('where', 'payment_type', '=', Orders::CASH_PAYMENT);
 //        $this->crud->addClause('where', 'status', '=', 6);
@@ -71,8 +92,9 @@ class OrdersCollectedCrudController extends CrudController
     }
     protected function showDetailsRow($id)
     {
-        $notPaidInvoices = Orders::where('driver_id',$id)->where(function ($query) {
+         $notPaidInvoices = Orders::where('driver_id',$id)->where(function ($query) {
             $query->where('amount', '!=', 0)
+                ->whereBetween('date',[session('searchDateFrom'),session('searchDateTo')])
                 ->Where('amount', '!=', 'NULL');
         })->where('order_collected',0)->where('is_paid',1)->where('payment_type',Orders::CASH_PAYMENT)->get();
         $invoices = Orders::where('driver_id',$id)->where(function ($query) {
