@@ -284,7 +284,19 @@ class OrdersCrudController extends CrudController
             function($value) { // if the filter is active\
                 $this->crud->addClause('whereIn', 'driver_id', json_decode($value));
             });
+        $this->crud->addFilter([
+            'name'        => 'from_to',
+            'type'        => 'date_range',
+            'label'       => trans('admin.Date From To'),
+            'placeholder' => trans('admin.Pick a date')
+        ],
 
+            false,
+            function ($value) { // if the filter is active, apply these constraints
+                $dates = json_decode($value);
+                 $this->crud->addClause('where', 'date', '>=', $dates->from);
+                 $this->crud->addClause('where', 'date', '<=', $dates->to . ' 23:59:59');
+            });
         $this->crud->addFilter([
             'name'        => 'car_id',
             'type'        => 'select2_ajax',
@@ -1110,9 +1122,7 @@ class OrdersCrudController extends CrudController
                 [   // view
                     'name' => 'custom-ajax-button',
                     'type' => 'view',
-                    'view' => ('orders.custom-order-history')->with('values','asdf'),
-                    'with'=>['values'=>'asdfafasdfasasfd'],
-                    'value' => 'Texts',
+                    'view' => ('orders.custom-order-history'),
                     'tab' => 'Texts',
 
                 ]);
