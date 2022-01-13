@@ -12,9 +12,6 @@
       <change afterPath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/A00C6F0A2CDEB37AC19CFC31FF1D06F2C55B5189" afterDir="false" />
       <change afterPath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/F9A83366990F038FA506FE1FF81DC2673706B40D" afterDir="false" />
       <change afterPath="$USER_HOME$/AppData/Local/Temp/AdobeARM.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/Admin/OrdersLogsCrudController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Models/OrdersHistory.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/views/orders/custom-order-history.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../Program Files/adaware/adaware antivirus/Antimalware Engine/definitions/loc1/1052cb9afa9234edf76431f7a403a165-4a04b473620f0a315eeb657cb30c7c4c-mdx_xf.cvd.gzip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../Program Files/adaware/adaware antivirus/Antimalware Engine/definitions/loc1/153b1583af7dba13d958449d09af0a97-dca5dc3bf3f12e4d1c6f5091c2b4ef81-vbaid.cvd.upd" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../Program Files/adaware/adaware antivirus/Antimalware Engine/definitions/loc1/17ad6608f41ed1b57f0b8a451c39d0e6-0c7d22d0dba3896fcfbf944f9fe52e33-emalware.i76.upd" beforeDir="false" />
@@ -3989,7 +3986,7 @@
       <change beforePath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B4E55755FC6B65B3E02F81890B895D792C34761B" beforeDir="false" />
       <change beforePath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B4E5CE19F9194451EC89C3D8B46FB7222C932636" beforeDir="false" />
       <change beforePath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B509AA194CC1FF4E58891A1A636A90EB23E88FE4" beforeDir="false" afterPath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B509AA194CC1FF4E58891A1A636A90EB23E88FE4" afterDir="false" />
-      <change beforePath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B535641CB2419E923A49A5A35E87CB8F0A4360DD" beforeDir="false" />
+      <change beforePath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B535641CB2419E923A49A5A35E87CB8F0A4360DD" beforeDir="false" afterPath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B535641CB2419E923A49A5A35E87CB8F0A4360DD" afterDir="false" />
       <change beforePath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B5653590656DB45D468EF03201539AE62820D6BB" beforeDir="false" />
       <change beforePath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B5712449D410E2E4038F88E446CF5C8FF6FBEF25" beforeDir="false" />
       <change beforePath="$USER_HOME$/AppData/Local/Mozilla/Firefox/Profiles/f0amqvi8.default-release-1603823251236/cache2/entries/B598BD490A9DC3E784D7E13559CBD7A79B696957" beforeDir="false" />
@@ -10603,17 +10600,9 @@
       <change beforePath="$PROJECT_DIR$/../material/material/tests/ExampleTest.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../material/material/tests/TestCase.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Admin/OrdersCollectedCrudController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Admin/OrdersCollectedCrudController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Admin/OrdersCrudController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Admin/OrdersCrudController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Admin/UserCrudController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Admin/UserCrudController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Orders.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Orders.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/User.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/lang/ar/admin.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/lang/ar/admin.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/lang/en/admin.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/lang/en/admin.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/backpack/custom.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/backpack/custom.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_static.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/autoload_static.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/package-versions-deprecated/src/PackageVersions/Versions.php" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/composer/package-versions-deprecated/src/PackageVersions/Versions.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../t5rogeve/app/Helpers/sendNotification.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../t5rogeve/app/Http/Controllers/Admin/AreasCrudController.php" beforeDir="false" afterPath="$PROJECT_DIR$/../t5rogeve/app/Http/Controllers/Admin/AreasCrudController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../t5rogeve/app/Http/Controllers/Admin/ExpiredEventsCrudController.php" beforeDir="false" />
@@ -10861,7 +10850,7 @@
       <workItem from="1630910905435" duration="21317000" />
       <workItem from="1631430291398" duration="12256000" />
       <workItem from="1641795024691" duration="3960000" />
-      <workItem from="1642053053172" duration="12650000" />
+      <workItem from="1642053053172" duration="13646000" />
     </task>
     <servers />
   </component>

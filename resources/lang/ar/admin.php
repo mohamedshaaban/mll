@@ -172,7 +172,7 @@ return array(
     'Date From To'=>'من الي',
     'Date From'=>'من',
     'Revenue Xero'=>'Revenue Xero Account',
-    ''=>'',
+    'Price'=>'السعر',
     ''=>'',
     ''=>'',
     ''=>'',

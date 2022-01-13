@@ -152,6 +152,14 @@ class OrdersCrudController extends CrudController
             'orderable' => true
         ]);
         $this->crud->addColumn([ // Text
+            'name' => 'amount',
+            'label' => trans('admin.Price'),
+            'orderable' => true,
+            'orderLogic' => function ($query, $column, $columnDirection) {
+                return $query->orderBy('amount', $columnDirection)->select('orders.*');
+            }
+        ]);
+        $this->crud->addColumn([ // Text
             'name' => 'requeststatus',
             'label' => trans('admin.status'),
             'type' => 'relationship',

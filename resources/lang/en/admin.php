@@ -176,7 +176,7 @@ return array(
     'Date From'=>'Date From',
     'Revenue Xero'=>'Revenue Xero Account',
     'new_value'=>'new value',
-    ''=>'',
+    'Price'=>'Price',
     ''=>'',
     ''=>'',
 
