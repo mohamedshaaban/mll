@@ -46,6 +46,7 @@
                                         <th class="border-0 text-uppercase small font-weight-bold">Car Make</th>
                                         <th class="border-0 text-uppercase small font-weight-bold">Car Plate ID </th>
                                         <th class="border-0 text-uppercase small font-weight-bold">Driver</th>
+                                        <th class="border-0 text-uppercase small font-weight-bold">Remarks</th>
                                         <th class="border-0 text-uppercase small font-weight-bold">From</th>
                                         <th class="border-0 text-uppercase small font-weight-bold">To</th>
 
@@ -62,6 +63,7 @@
                                             <td>{{ @$order->carmakes->name_en }}</td>
                                             <td>{{ @$order->cars->car_plate_id }}</td>
                                             <td>{{ @$order->driver->name }}</td>
+                                            <td>{{ @$order->remarks }}</td>
                                             <td>{{ @$order->areafrom->name_en }}</td>
                                             <td>{{ @$order->areato->name_en }}</td>
                                             <td>{{ number_format($order->amount,3) }} KD</td>
