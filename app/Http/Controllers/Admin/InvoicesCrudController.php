@@ -116,7 +116,7 @@ class InvoicesCrudController extends CrudController
 
             $text.='<tr class="even">';
             $text.= '<td><input type="checkbox" name="orderid[]" class="orderchk'.$order->paid_by.'" value="'.$order->id.'"/> </td>';
-            $text.= '<td>'.@$order->invoice_unique_id.'</td>';
+            $text.= '<td><a href="/admin/orders/'.@$order->id.'/edit" target="_blank">'.@$order->invoice_unique_id.'</a></td>';
             $text.= '<td>'.@$order->date.'</td>';
 //            $text.= '<td>'.@$order->areafrom->name_en.'</td>';
 //            $text.= '<td>'.@$order->areato->name_en.'</td>';
