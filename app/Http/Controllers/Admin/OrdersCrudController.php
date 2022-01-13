@@ -7,6 +7,7 @@ use App\Http\Requests\OrdersRequest as StoreRequest;
 // VALIDATION: change the requests to match your own file names if you need form validation
 use App\Models\CarModel;
 use App\Models\Invoices;
+use App\Models\OrdersHistory;
 use App\Models\RequestStatus;
 use App\Models\Customers;
 use App\Models\OrderInvoicess;
@@ -56,34 +57,17 @@ class OrdersCrudController extends CrudController
         $this->crud->setRequest($this->crud->validateRequest());
         $this->crud->unsetValidation(); // validation has already been run
 
-//        $chkXeroToken = checkxerotoken();
-//        if(!$chkXeroToken)
-//        {
-//            \Alert::error(trans('admin.Somethings went wrong please try again'))->flash();
-//
-//            return  ;
-//        }
 
         $response = $this->traitStore();
 
         $order = Orders::find($this->crud->entry->id);
-//            $order->invoice_unique_id = 'WbMll-'.generateRandomString(5);
-        if ($order->payment_type == Orders::KNET_PAYMENT) {
-//               $paymentLink =  tappayment($order);
 
-
-        }
         $url = generateRandomString(10);
         $order->url = $url;
         $order->payment_link = url('/') . '/payorder/' . $url;
         if (!$order->paid_by) {
             $order->paid_by = $order->customer_id;
         }
-//        if (!$order->is_paid) {
-//            $order->is_paid = 0;
-//            $order->save();
-//
-//        }
         $driver = User::where('id', $order->driver_id)->first();
         if (!$order->comission) {
             if ($driver) {
@@ -437,7 +421,7 @@ class OrdersCrudController extends CrudController
 
         $readonly_ispaid = '';
         $readonly = false;
-
+        session(['orderChanges'=>null]);
         $order = null;
         if ((request()->route('id'))) {
             $order = Orders::find(request()->route('id'));
@@ -455,6 +439,7 @@ class OrdersCrudController extends CrudController
         if($lastOrder)
         {
             $lastOrderId = $lastOrder->id;
+            session(['orderChanges'=>OrdersHistory::where('order_id',$lastOrderId)->orderBy('id','DESC')->get()]);
         }
         CRUD::setValidation(StoreRequest::class);
         if($readonly)
@@ -546,34 +531,7 @@ class OrdersCrudController extends CrudController
                     'class' => ' not_exits_make-class',
                 ]
             ]);
-//            $this->crud->addField([ // select2_from_ajax: 1-n relationship
-//                'tab' => 'Texts',
-//                'type' => 'text',
-//
-//                'name' => 'car_model_text', // the column that contains the ID of that connected entity;
-//                'label' => trans('admin.Car model'), // placeholder for the select
-//                'placeholder' => trans('admin.Enter model'), // placeholder for the select
-//                'attributes' => [
-//                    'class' => 'form-control modeltext-class',
-//                ],
-//                // 'method'                    => 'GET', // optional - HTTP method to use for the AJAX call (GET, POST)
-//            ]);
-//            $this->crud->addField([ // select2_from_ajax: 1-n relationship
-//                'tab' => 'Texts',
-//                'include_all_form_fields' => true, //sends the other form fields along with the request so it can be filtered.
-//                'minimum_input_length' => 0, 'label' => trans('admin.Car Model'), // Table column heading
-//                'type' => 'select2_from_ajax',
-//                'name' => 'car_model', // the column that contains the ID of that connected entity;
-//                'entity' => 'carmodel', // the method that defines the relationship in your Model
-//                'attribute' => 'name_en', // foreign key attribute that is shown to user
-//                'data_source' => url("/admin/fetch/carmodel"), // url to controller search function (with /{id} should return model)
-//                'placeholder' => 'Select model', // placeholder for the select
-//                'dependencies' => ['car_make'], // when a dependency changes, this select2 is reset to null
-//                'attributes' => [
-//                    'class' => 'form-control modelselect-class',
-//                ],
-//                // 'method'                    => 'GET', // optional - HTTP method to use for the AJAX call (GET, POST)
-//            ]);
+
             CRUD::addField([  // Select2
                 'label' => trans('admin.Car Plate ID'),
                 'type' => 'relationship',
@@ -632,18 +590,15 @@ class OrdersCrudController extends CrudController
             ]);
 
             $drivs = User::where('is_driver',1)->pluck('name','id')->toArray();
-//dd($drivs);
-            CRUD::addField([  // Select2
+             CRUD::addField([  // Select2
                 'label' => trans('admin.Driver'),
                 'type' => 'select_from_array',
                 'name' => 'driver_id', // the db column for the foreign key
                 'entity' => 'driver', // the method that defines the relationship in your Model
-//                'attribute' => 'name', // foreign key attribute that is shown to use
-                'tab' => 'Texts',
+                 'tab' => 'Texts',
                 'options'     =>
                     $drivs,
-//                'data_source' => url("/admin/fetch/driver"), // url to controller search function (with /{id} should return model)
-                'attributes' => [
+                 'attributes' => [
                     'class' => 'form-control comissiondriverlist-class',
 
                 ],
@@ -712,8 +667,7 @@ class OrdersCrudController extends CrudController
                 'tab' => 'Texts',
                 'default' => 0,
                 'attributes' => [
-//                'readonly' => 'readonly',
-                    'class' => 'form-control comissiondriver-class',
+                     'class' => 'form-control comissiondriver-class',
 
                 ],
 
@@ -808,6 +762,14 @@ class OrdersCrudController extends CrudController
                 ],
 
             ]);
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'custom-ajax-button',
+                    'type' => 'view',
+                    'view' => 'orders.custom-order-history',
+                    'tab' => 'Texts',
+
+                ]);
         }
         else
         {
@@ -877,36 +839,7 @@ class OrdersCrudController extends CrudController
 
                 ]
             ]);
-//            $this->crud->addField([ // select2_from_ajax: 1-n relationship
-//                'tab' => 'Texts',
-//                'type' => 'text',
-//
-//                'name' => 'car_model_text', // the column that contains the ID of that connected entity;
-//                'label' => trans('admin.Car model'), // placeholder for the select
-//                'placeholder' => trans('admin.Enter model'), // placeholder for the select
-//                'attributes' => [
-//                    'class' => 'form-control modeltext-class',
-//                    'disabled' => 'disabled',
-//                ],
-//                // 'method'                    => 'GET', // optional - HTTP method to use for the AJAX call (GET, POST)
-//            ]);
-//            $this->crud->addField([ // select2_from_ajax: 1-n relationship
-//                'tab' => 'Texts',
-//                'include_all_form_fields' => true, //sends the other form fields along with the request so it can be filtered.
-//                'minimum_input_length' => 0, 'label' => trans('admin.Car Model'), // Table column heading
-//                'type' => 'select2_from_ajax',
-//                'name' => 'car_model', // the column that contains the ID of that connected entity;
-//                'entity' => 'carmodel', // the method that defines the relationship in your Model
-//                'attribute' => 'name_en', // foreign key attribute that is shown to user
-//                'data_source' => url("/admin/fetch/carmodel"), // url to controller search function (with /{id} should return model)
-//                'placeholder' => 'Select model', // placeholder for the select
-//                'dependencies' => ['car_make'], // when a dependency changes, this select2 is reset to null
-//                'attributes' => [
-//                    'class' => 'form-control modelselect-class',
-//                    'disabled' => 'disabled',
-//                ],
-//                // 'method'                    => 'GET', // optional - HTTP method to use for the AJAX call (GET, POST)
-//            ]);
+
             CRUD::addField([  // Select2
                 'label' => trans('admin.Car Plate ID'),
                 'type' => 'relationship',
@@ -983,13 +916,10 @@ class OrdersCrudController extends CrudController
                 'label' => trans('admin.Driver'),
                 'type' => 'select_from_array',
                 'name' => 'driver_id', // the db column for the foreign key
-//                'entity' => 'driver', // the method that defines the relationship in your Model
-//                'attribute' => 'name', // foreign key attribute that is shown to use
-                'tab' => 'Texts',
+                  'tab' => 'Texts',
                 'options'     =>
                     $drivs,
-//                'data_source' => url("/admin/fetch/driver"), // url to controller search function (with /{id} should return model)
-                'attributes' => [
+                 'attributes' => [
                     'class' => 'form-control comissiondriverlist-class',
                     'disabled' => 'disabled',
                 ],
@@ -1168,6 +1098,16 @@ class OrdersCrudController extends CrudController
                 ],
 
             ]);
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'custom-ajax-button',
+                    'type' => 'view',
+                    'view' => ('orders.custom-order-history')->with('values','asdf'),
+                    'with'=>['values'=>'asdfafasdfasasfd'],
+                    'value' => 'Texts',
+                    'tab' => 'Texts',
+
+                ]);
         }
 
         if($readonly)
@@ -1260,8 +1200,24 @@ class OrdersCrudController extends CrudController
         }
         else
         {
-
+            try {
             xeroquotestoinvoice($order->id, 1);
+            } catch (\Exception $ex) {
+            }
+        }
+        $changes = $previousOrder->compareTo($order);
+        foreach ($changes as $key=>$change)
+        {
+            if(!in_array($key,['id','created_at','updated_at'])) {
+                OrdersHistory::create([
+                    'order_id' => $order->id,
+                    'user_id' => backpack_user()->id,
+                    'field' => $key,
+                    'old_value' => $previousOrder->$key,
+                    'new_value' => $change,
+                    'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->$key . ' to ' . $change
+                ]);
+            }
         }
         return $response;
     }

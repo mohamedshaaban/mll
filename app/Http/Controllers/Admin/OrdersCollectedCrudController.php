@@ -42,24 +42,16 @@ class OrdersCollectedCrudController extends CrudController
             }
         }
         $this->crud->addFilter([
-            'name'        => 'datefrom',
-            'type'        => 'date',
-            'label'       => trans('admin.Date From'),
+            'name'        => 'from_to',
+            'type'        => 'date_range',
+            'label'       => trans('admin.Date From To'),
             'placeholder' => trans('admin.Pick a date')
         ],
             false,
             function ($value) { // if the filter is active, apply these constraints
-            session(['searchDateFrom'=>$value]);
-            });
-        $this->crud->addFilter([
-            'name'        => 'dateto',
-            'type'        => 'date',
-            'label'       => trans('admin.Date To'),
-            'placeholder' => trans('admin.Pick a date')
-        ],
-            false,
-            function ($value) { // if the filter is active, apply these constraints
-            session(['searchDateTo'=>$value]);
+                $dates = json_decode($value);
+            session(['searchDateFrom'=>$dates->from]);
+            session(['searchDateTo'=>$dates->to]);
             });
 
          $this->crud->addClause('where','is_driver', '=', '1');

@@ -32,6 +32,7 @@ Route::group([
     Route::crud('requeststatus', 'RequestStatusCrudController');
     Route::crud('customers', 'CustomersCrudController');
     Route::crud('orders', 'OrdersCrudController');
+    Route::crud('orderslogs', 'OrdersLogsCrudController');
     Route::crud('driversorders', 'OrdersDriverCrudController');
     Route::crud('orderscollected', 'OrdersCollectedCrudController');
     Route::crud('comissions', 'ComissionsCrudController');

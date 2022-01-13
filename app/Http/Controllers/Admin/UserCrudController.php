@@ -286,6 +286,12 @@ class UserCrudController extends CrudController
                 'tab'=>'Driver',
             ],
             [
+                'name'  => 'xero_revenue_account',
+                'label' => trans('admin.Revenue Xero'),
+                'type'  => 'text',
+                'tab'=>'Driver',
+            ],
+            [
                 'name'  => 'commission',
                 'label' => trans('admin.Commission'),
                 'type'  => 'text',

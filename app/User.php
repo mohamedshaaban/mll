@@ -25,7 +25,7 @@ class User extends Authenticatable
      */
     protected $appends=['comission','pending_comission','cashwithdriver','cashcollected'];
     protected $fillable = [
-        'name', 'email', 'password','nationality','mobile','photo','civil_front_id','civil_back_id','license_front_id','license_back_id','xero_account','commission','commission_type','is_driver','rolesdb'
+        'name', 'email', 'password','nationality','mobile','photo','civil_front_id','civil_back_id','license_front_id','license_back_id','xero_account','xero_revenue_account','commission','commission_type','is_driver','rolesdb'
     ];
 
     /**
