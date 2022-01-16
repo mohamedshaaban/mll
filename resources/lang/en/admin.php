@@ -177,6 +177,9 @@ return array(
     'Revenue Xero'=>'Revenue Xero Account',
     'new_value'=>'new value',
     'Price'=>'Price',
+    'check_refrenece'=>'check number',
+    'Check'=>'Check',
+    ''=>'',
     ''=>'',
     ''=>'',
 

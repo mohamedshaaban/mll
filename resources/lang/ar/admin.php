@@ -173,8 +173,8 @@ return array(
     'Date From'=>'من',
     'Revenue Xero'=>'Revenue Xero Account',
     'Price'=>'السعر',
-    ''=>'',
-    ''=>'',
+    'check_refrenece'=>'رقم الشيك',
+    'Check'=>'شيك',
     ''=>'',
 
 

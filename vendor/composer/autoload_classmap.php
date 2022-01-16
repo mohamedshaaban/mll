@@ -10,6 +10,7 @@ return array(
     'AddBrowseMultipleToMonstersTable' => $baseDir . '/database/migrations/2019_12_02_101119_add_browse_multiple_to_monsters_table.php',
     'AddCarMakeModelsTable' => $baseDir . '/database/migrations/2021_08_24_101159_add_car_make_models_table.php',
     'AddCarMakeTableOrder' => $baseDir . '/database/migrations/2021_09_06_134409_add_car_make_table_order.php',
+    'AddCheckRefreneceTable' => $baseDir . '/database/migrations/2022_01_16_144641_add_check_refrenece_tableorders.php',
     'AddCollectedDateOrders' => $baseDir . '/database/migrations/2021_10_18_124941_add_collected_date_orders.php',
     'AddCollectedOrderOrders' => $baseDir . '/database/migrations/2021_08_23_113724_add_collected_order_orders.php',
     'AddCommissionDriverTableUsers' => $baseDir . '/database/migrations/2021_09_06_065232_add_commission_driver_table_users.php',

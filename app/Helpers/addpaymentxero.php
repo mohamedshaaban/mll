@@ -16,12 +16,19 @@ if ( ! function_exists( 'addpaymentxero' ) ) {
         generatexerotoken();
 
         $lineItems = [] ;
+        $Reference = '';
         if($isOrder)
         {
             $order = \App\Models\Orders::find($data);
             if($order->payment_type == Orders::KNET_PAYMENT)
             {
                 $code = config('app.XEROKNET');
+            }
+            else if ($order->payment_type == Orders::CHECK_PAYMENT)
+            {
+                $Reference = $order->check_refrenece;
+
+                $code = config('app.XEROCHECK');
             }
         }
         else
@@ -40,7 +47,7 @@ if ( ! function_exists( 'addpaymentxero' ) ) {
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => '{ "Payments": [ { "Invoice": {  "InvoiceID": "'.$order->xero_id.'" }, "Account": { "Code": "'.$code.'" }, "Date": "'.Carbon::now()->format('Y-m-d').'", "Amount": "'.$amount.'" } ] }',
+            CURLOPT_POSTFIELDS => '{ "Payments": [ { "Invoice": {  "InvoiceID": "'.$order->xero_id.'" }, "Account": { "Code": "'.$code.'" }, "Date": "'.Carbon::now()->format('Y-m-d').'","Reference":"'.$Reference.'", "Amount": "'.$amount.'" } ] }',
             CURLOPT_HTTPHEADER => array(
                 'xero-tenant-id: '.config('app.XERO_TENANT_ID'),
                 'Authorization: Bearer '.session('xero_token'),

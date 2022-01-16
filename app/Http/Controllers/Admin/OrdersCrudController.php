@@ -105,10 +105,18 @@ class OrdersCrudController extends CrudController
                 $order->status = Orders::COMPLETED_ORDER;
                 $order->save();
             }
-            $account = isset($driver)? $driver->xero_account : null ;
-            if(!$account)
+            if(($order->payment_type == Orders::KNET_PAYMENT))
             {
-                $account  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
+                $account = config('app.XEROKNET');
+
+            }
+            elseif (($order->payment_type == Orders::CHECK_PAYMENT))
+            {
+                $account = config('app.XEROCHECK');
+            }
+            else
+            {
+                $account = isset($driver)? $driver->xero_account : null ;
             }
             try {
                 $order->refresh();
@@ -648,6 +656,7 @@ class OrdersCrudController extends CrudController
                 'tab' => 'Texts',
 
             ]);
+
             $this->crud->addField([   // DateTime
                 'tab' => 'Texts',
 
@@ -707,6 +716,7 @@ class OrdersCrudController extends CrudController
                     // the key will be stored in the db, the value will be shown as label;
                     Orders::CASH_PAYMENT => trans("admin.Cash"),
                     Orders::KNET_PAYMENT => trans("admin.Knet"),
+                    Orders::CHECK_PAYMENT => trans("admin.Check"),
 //                Orders::LATE_PAYMENT => "Late"
                 ],
                 'default' => Orders::KNET_PAYMENT,
@@ -753,6 +763,16 @@ class OrdersCrudController extends CrudController
 
                 ]);
             }
+            CRUD::addField([ // Text
+                'name' => 'check_refrenece',
+                'label' => trans('admin.check_refrenece'),
+                'type' => 'text',
+                'tab' => 'Texts',
+                'attributes' => [
+                    'class' => 'form-control chkreference',
+                ],
+
+            ]);
             CRUD::addField([ // Text
                 'name' => 'link_generated',
                 'label' => trans('admin.Payment Invoice Generted'),
@@ -975,6 +995,7 @@ class OrdersCrudController extends CrudController
                     'disabled' => 'disabled',
                 ],
             ]);
+
             $this->crud->addField([   // DateTime
                 'tab' => 'Texts',
 
@@ -1041,6 +1062,8 @@ class OrdersCrudController extends CrudController
                     // the key will be stored in the db, the value will be shown as label;
                     Orders::CASH_PAYMENT => trans("admin.Cash"),
                     Orders::KNET_PAYMENT => trans("admin.Knet"),
+                    Orders::CHECK_PAYMENT => trans("admin.Check"),
+
 //                Orders::LATE_PAYMENT => "Late"
                 ],
                 'default' => Orders::CASH_PAYMENT,
@@ -1088,6 +1111,17 @@ class OrdersCrudController extends CrudController
 
                 ]);
             }
+
+            CRUD::addField([ // Text
+                'name' => 'check_refrenece',
+                'label' => trans('admin.check_refrenece'),
+                'type' => 'text',
+                'tab' => 'Texts',
+                'attributes' => [
+                    'class' => 'form-control chkreference',
+                    'disabled' => 'disabled',
+                ],
+            ]);
             CRUD::addField([ // Text
                 'name' => 'link_generated',
                 'label' => trans('admin.Payment Invoice Generted'),
@@ -1206,11 +1240,24 @@ class OrdersCrudController extends CrudController
                 $order->status = Orders::COMPLETED_ORDER;
                 $order->save();
             }
-            $account = isset($driver)? $driver->xero_account : null ;
-            if(!$account)
+            if(($order->payment_type == Orders::KNET_PAYMENT))
             {
-                $account  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
+                $account = config('app.XEROKNET');
+
             }
+            elseif (($order->payment_type == Orders::CHECK_PAYMENT))
+            {
+                $account = config('app.XEROCHECK');
+            }
+            else
+            {
+                $account = isset($driver)? $driver->xero_account : null ;
+            }
+//            $account = isset($driver)? $driver->xero_account : null ;
+//            if(!$account)
+//            {
+//                $account  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
+//            }
             try {
                 (addpaymentxero($order->id, 1, $order->amount, $account));
             } catch (\Exception $ex) {

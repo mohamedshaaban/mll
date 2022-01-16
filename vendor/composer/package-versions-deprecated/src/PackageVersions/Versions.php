@@ -187,7 +187,7 @@ final class Versions
   'symfony/debug' => 'v4.4.27@2f9160e92eb64c95da7368c867b663a8e34e980c',
   'symfony/dom-crawler' => 'v5.3.4@2dd8890bd01be59a5221999c05ccf0fcafcb354f',
   'theseer/tokenizer' => '1.2.1@34a41e998c2183e22995f158c581e7b5e755ab9e',
-  'backpack/demo' => '2.x-dev@d2b22e6e4609dfdb36c56ed93082979c93e92412',
+  'backpack/demo' => '2.x-dev@e9cbaef765fa74d7b427a8ad2613659f39a838f5',
 );
 
     private function __construct()

@@ -718,6 +718,7 @@ class ComposerStaticInitc22687eda6b58df163a3d90a016a016c
         'AddBrowseMultipleToMonstersTable' => __DIR__ . '/../..' . '/database/migrations/2019_12_02_101119_add_browse_multiple_to_monsters_table.php',
         'AddCarMakeModelsTable' => __DIR__ . '/../..' . '/database/migrations/2021_08_24_101159_add_car_make_models_table.php',
         'AddCarMakeTableOrder' => __DIR__ . '/../..' . '/database/migrations/2021_09_06_134409_add_car_make_table_order.php',
+        'AddCheckRefreneceTable' => __DIR__ . '/../..',
         'AddCollectedDateOrders' => __DIR__ . '/../..' . '/database/migrations/2021_10_18_124941_add_collected_date_orders.php',
         'AddCollectedOrderOrders' => __DIR__ . '/../..' . '/database/migrations/2021_08_23_113724_add_collected_order_orders.php',
         'AddCommissionDriverTableUsers' => __DIR__ . '/../..' . '/database/migrations/2021_09_06_065232_add_commission_driver_table_users.php',

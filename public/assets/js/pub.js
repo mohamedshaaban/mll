@@ -151,10 +151,17 @@ $('.not_exits_make-class').change(function() {
 $( ".paymenttype-class" ).change(function() {
      if ($(this).val() == '2') {
           $('.paidpayment-class').parent().fadeOut();
-    }
+         $('.chkreference').parent().fadeOut();
+
+     }
+    else if($(this).val() == '3')
+     {
+         $('.paidpayment-class').parent().fadeIn();
+         $('.chkreference').parent().fadeIn();
+     }
     else
     {
-
+        $('.chkreference').parent().fadeOut();
         $('.paidpayment-class').parent().fadeIn();
     }
 });
