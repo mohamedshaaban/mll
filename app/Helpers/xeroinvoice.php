@@ -18,7 +18,8 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
         {
             $order = \App\Models\Orders::find($data);
             $driver = User::where('id', $order->driver_id)->first();
-//            $account = isset($driver)? $driver->xero_account : null ;
+            $account = '200';
+            $account = isset($driver)? $driver->xero_revenue_account : '200' ;
 //            if(!$account)
 //            {
 //                $account  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
@@ -27,7 +28,7 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
 //            {
 //                $account = config('app.XEROKNET');
 //            }
-            $account = '200';
+
             $xero_unique = 'WBMll-'.$order->id.'-'.$order->customers->mobile;
             if($order->areafrom)
             {
@@ -56,7 +57,9 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
 //                {
 //                    $account = config('app.XEROKNET');
 //                }
+                $driver = User::where('id', $order->driver_id)->first();
                 $account = '200';
+                $account = isset($driver)? $driver->xero_revenue_account : '200' ;
                 if($order->areafrom)
                 {
                     $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.', Phone :  '.@$order->customers->mobile.'  ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $account, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];

@@ -18,23 +18,23 @@ if ( ! function_exists( 'xeroquotes' ) ) {
         {
             $order = \App\Models\Orders::find($data);
             $driver = User::where('id', $order->driver_id)->first();
-            $acccount = isset($driver)? $driver->xero_account : null ;
+            $acccount = isset($driver)? $driver->xero_revenue_account : '200' ;
             if(!$acccount)
             {
                 $acccount  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
             }
-
-            if($order->payment_type == Orders::KNET_PAYMENT)
-            {
-                $account = config('app.XEROKNET');
-            }
+//
+//            if($order->payment_type == Orders::KNET_PAYMENT)
+//            {
+//                $account = config('app.XEROKNET');
+//            }
             if($order->areafrom)
             {
-                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.',   Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> '200', "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
+                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.',   Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $acccount, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
             }
             else
             {
-                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=>'200' , "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
+                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=>$acccount , "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
 
             }
         }
@@ -52,20 +52,20 @@ if ( ! function_exists( 'xeroquotes' ) ) {
                 if($order->areafrom)
                 {
                     $driver = User::where('id', $order->driver_id)->first();
-                    $acccount = isset($driver)? $driver->xero_account : null ;
+                    $acccount = isset($driver)? $driver->xero_revenue_account : '200' ;
                     if(!$acccount)
                     {
                         $acccount  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
                     }
-                    if($order->payment_type == Orders::KNET_PAYMENT)
-                    {
-                        $account = config('app.XEROKNET');
-                    }
-                    $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> '200', "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
+//                    if($order->payment_type == Orders::KNET_PAYMENT)
+//                    {
+//                        $account = config('app.XEROKNET');
+//                    }
+                    $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $acccount, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
                 }
                 else
                 {
-                    $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> '200', "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
+                    $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $acccount, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
 
                 }
             }
@@ -156,22 +156,22 @@ if ( ! function_exists( 'xeroquotestoinvoice' ) ) {
             $order = \App\Models\Orders::find($data);
         $driver = User::where('id', $order->driver_id)->first();
         $total = 0 ;
-        $acccount = isset($driver)? $driver->xero_account : null ;
+        $acccount = isset($driver)? $driver->xero_revenue_account : '200' ;
         if(!$acccount)
         {
             $acccount  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
         }
-        if($order->payment_type == Orders::KNET_PAYMENT)
-        {
-            $account = config('app.XEROKNET');
-        }
+//        if($order->payment_type == Orders::KNET_PAYMENT)
+//        {
+//            $account = config('app.XEROKNET');
+//        }
             if($order->areafrom)
             {
-                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount, "AccountCode"=> '200', "TaxType"=> "NONE", "LineAmount"=> $order->amount ];
+                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount, "AccountCode"=> $acccount, "TaxType"=> "NONE", "LineAmount"=> $order->amount ];
             }
             else
             {
-                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount, "AccountCode"=> '200', "TaxType"=> "NONE", "LineAmount"=> $order->amount ];
+                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount, "AccountCode"=> $acccount, "TaxType"=> "NONE", "LineAmount"=> $order->amount ];
 
             }
             if( $order->amount < 1 ) {
