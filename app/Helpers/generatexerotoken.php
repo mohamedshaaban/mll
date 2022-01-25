@@ -12,7 +12,6 @@ if ( ! function_exists( 'generatexerotoken' ) ) {
      * @return  float|integer
      */
     function generatexerotoken() {
- 
         if(session('XEROREFRESHTOKEN'))
         {
             $token = session('XEROREFRESHTOKEN');
@@ -21,7 +20,9 @@ if ( ! function_exists( 'generatexerotoken' ) ) {
         {
             
             $token = config('app.XEROREFRESHTOKEN');
+
         }
+
         if(session('xero_token'))
         {
             $xerotoken = session('xero_token');
@@ -40,7 +41,7 @@ if ( ! function_exists( 'generatexerotoken' ) ) {
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_POSTFIELDS => array('grant_type' => 'refresh_token','refresh_token' => $token,'client_id' => '174D3BBAF23B4F83A362E57A89788F05','client_secret' => 'PO9Tm2SiDqTYSHjUfqPKuV5zAVux9JEeUhE9jJHdnyALWDSt'),
+            CURLOPT_POSTFIELDS => array('grant_type' => 'refresh_token','refresh_token' => $token,'client_id' => config('app.XEROCLIENTID'),'client_secret' => config('app.XEROCLIENTSECRET')),
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_HTTPHEADER => array(
                 "cache-control: no-cache",
@@ -53,7 +54,6 @@ if ( ! function_exists( 'generatexerotoken' ) ) {
         $response = curl_exec($curl);
         $res = json_decode($response, true);
 
-//        var_dump($res);
         $err = curl_error($curl);
 
         curl_close($curl);
@@ -70,7 +70,7 @@ if ( ! function_exists( 'generatexerotoken' ) ) {
                 CURLOPT_MAXREDIRS => 10,
                 CURLOPT_TIMEOUT => 30,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_POSTFIELDS => array('grant_type' => 'refresh_token','refresh_token' => $token,'client_id' => '174D3BBAF23B4F83A362E57A89788F05','client_secret' => 'PO9Tm2SiDqTYSHjUfqPKuV5zAVux9JEeUhE9jJHdnyALWDSt'),
+                CURLOPT_POSTFIELDS => array('grant_type' => 'refresh_token','refresh_token' => $token,'client_id' => config('app.XEROCLIENTID'),'client_secret' => config('app.XEROCLIENTSECRET')),
                 CURLOPT_CUSTOMREQUEST => "POST",
                 CURLOPT_HTTPHEADER => array(
                     "cache-control: no-cache",

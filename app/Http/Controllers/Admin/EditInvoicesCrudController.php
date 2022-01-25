@@ -14,7 +14,7 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 
-class InvoicesCrudController extends CrudController
+class EditInvoicesCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -24,13 +24,18 @@ class InvoicesCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\BulkDeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\BulkCloneOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
-
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation {
+        store as traitStore;
+    }
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation {
+        update as traitUpdate;
+    }
     public function setup()
     {
         App::setLocale(session('locale'));
 
-        CRUD::setModel(\App\Models\Customers::class);
-        CRUD::setRoute(config('backpack.base.route_prefix').'/invoices');
+        CRUD::setModel(\App\Models\Invoices::class);
+        CRUD::setRoute(config('backpack.base.route_prefix').'/editinvoices');
         CRUD::setEntityNameStrings(trans('admin.Generate invoices'), trans('admin.Generate invoices'));
     }
 
@@ -222,7 +227,6 @@ class InvoicesCrudController extends CrudController
                     'options' => [
                         // the key will be stored in the db, the value will be shown as label;
                         Orders::CASH_PAYMENT => trans("admin.Cash"),
-                        Orders::KNET_PAYMENT => trans("admin.Knet"),
                         Orders::CHECK_PAYMENT => trans("admin.Check"),
                     ],
                 ],
@@ -239,7 +243,42 @@ class InvoicesCrudController extends CrudController
 
         $this->crud->setOperationSetting('contentClass', 'col-md-12');
     }
+    public function update()
+    {
+        //Get Total Amount of payment
+        $totalPaidAmt  = 0 ;
+        $totalOrderAmt  = 0 ;
+        $totalAmt  = 0 ;
+        foreach(json_decode($_REQUEST['payments']) as $payment){
+            $totalAmt += $payment->amount;
+        }
+        //End OF Get Total Amount of payment
+        //Get Total Amount of Orders
+        dump($totalAmt);
 
+
+        foreach(($_REQUEST['orderId']) as $orderId){
+            $order = Orders::find($orderId);
+            $totalOrderAmt += $order->amount - $order->discount;
+
+        }
+        //Total PAyment Cant be greater than total orders
+        if($totalAmt > $totalOrderAmt)
+        {
+            return \Redirect::back()->withErrors(['Total Payment Cant be greater than total of orders']);
+        }
+
+        //End OF Get Total Amount of Orders
+
+        $previousInvoice = Invoices::find($_REQUEST['id']);
+        $previousOrders = $previousInvoice->orders;
+
+        $response = $this->traitUpdate();
+
+        $newInvoice = Invoices::find($this->crud->entry->id);
+        return $response;
+
+    }
     protected function setupUpdateOperation()
     {
          $this->setupCreateOperation();
@@ -255,6 +294,15 @@ class InvoicesCrudController extends CrudController
 
         return $data;
 
+    }
+    public function store()
+    {
+        $this->crud->setRequest($this->crud->validateRequest());
+        $this->crud->unsetValidation(); // validation has already been run
+
+
+        $response = $this->traitStore();
+        return $response;
     }
 
 }

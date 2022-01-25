@@ -39,6 +39,7 @@ Route::group([
 
     Route::crud('user', 'UserCrudController');
     Route::crud('invoices', 'InvoicesCrudController');
+    Route::crud('editinvoices', 'EditInvoicesCrudController');
     Route::crud('xeroinvoices', 'XeroInvoicesCrudController');
     Route::crud('missingxero', 'MissingXeroCrudController');
     Route::get('invoice/generate', 'InvoicesCrudController@generateInvoice');

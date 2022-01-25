@@ -33,11 +33,18 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
             if($order->areafrom)
             {
                 $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.', Phone :  '.@$order->customers->mobile.'  ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $account, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
+                if($order->discount && $order->discount!=0)
+                {
+                    $lineItems[] = [ "Description"=> 'Discount', "Quantity"=> "1", "UnitAmount"=> -$order->discount, "AccountCode"=> config('app.XERODISCOUNT'), "TaxType"=> "NONE", "LineAmount"=> -$order->discount ];
+                }
+
             }
             else
             {
                 $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $account, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
-
+                if($order->discount && $order->discount!=0) {
+                    $lineItems[] = ["Description" => 'Discount', "Quantity" => "1", "UnitAmount" => -$order->discount, "AccountCode" => config('app.XERODISCOUNT'), "TaxType" => "NONE", "LineAmount" => -$order->discount];
+                }
             }
         }
         else
@@ -63,11 +70,16 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
                 if($order->areafrom)
                 {
                     $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.', Phone :  '.@$order->customers->mobile.'  ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $account, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
+                    if($order->discount && $order->discount!=0) {
+                        $lineItems[] = [ "Description"=> 'Discount', "Quantity"=> "1", "UnitAmount"=> -$order->discount, "AccountCode"=> config('app.XERODISCOUNT'), "TaxType"=> "NONE", "LineAmount"=> -$order->discount ];
+                    }
                 }
                 else
                 {
                     $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , Phone :  '.@$order->customers->mobile.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $account, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
-
+                    if($order->discount && $order->discount!=0) {
+                        $lineItems[] = [ "Description"=> 'Discount', "Quantity"=> "1", "UnitAmount"=> -$order->discount, "AccountCode"=> config('app.XERODISCOUNT'), "TaxType"=> "NONE", "LineAmount"=> -$order->discount ];
+                    }
                 }
             }
         }

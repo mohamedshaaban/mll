@@ -175,6 +175,16 @@ return array(
     'Price'=>'السعر',
     'check_refrenece'=>'رقم الشيك',
     'Check'=>'شيك',
+    'Edit'=>'تعديل',
+    'amount'=>'Amount',
+    'date'=>'Date',
+    'payment_type'=>'Payment Method',
+    'Url'=>'Url',
+    'invoice_unique_id'=>'invoice id',
+    ''=>'',
+    ''=>'',
+    ''=>'',
+    ''=>'',
     ''=>'',
 
 

@@ -44,7 +44,7 @@ class Customers extends Model
 
     public function getNumOfOrdersAttribute($value)
     {
-        return Orders::where('paid_by',$this->attributes['id'])->where('is_paid',1)->where('link_generated',0)->where('payment_type', Orders::KNET_PAYMENT)->where('status',6)->count();
+        return Orders::where('paid_by',$this->attributes['id'])->where('is_paid',1)->where('link_generated',0)->where('status',6)->count();
 
         return $this->orders->count();
 
@@ -52,22 +52,22 @@ class Customers extends Model
     public function getNumPendingOfOrdersAttribute($value)
     {
         
-        return Orders::where('paid_by',$this->attributes['id'])->where('is_paid', '!=' ,1)->where('payment_type', Orders::KNET_PAYMENT)->count();
+        return Orders::where('paid_by',$this->attributes['id'])->where('is_paid', '!=' ,1)->count();
     }
     public function getNumPaidOfOrdersAttribute($value)
     {
 
-        return Orders::where('paid_by',$this->attributes['id'])->where('is_paid', 1)->where('payment_type', Orders::KNET_PAYMENT)->count();
+        return Orders::where('paid_by',$this->attributes['id'])->where('is_paid', 1)->count();
     }
 
     public function getAmtPendingOfOrdersAttribute($value)
     {
-         return Orders::where('paid_by',$this->id)->where('is_paid', '!=' ,1)->where('payment_type', Orders::KNET_PAYMENT)->where('status',6)->sum('amount');
+         return Orders::where('paid_by',$this->id)->where('is_paid', '!=' ,1)->where('status',6)->sum('amount');
     }
     public function getAmtOfOrdersAttribute($value)
     {
 
-        return Orders::where('paid_by',$this->id)->where('is_paid', 1)->where('payment_type', Orders::KNET_PAYMENT)->sum('amount');
+        return Orders::where('paid_by',$this->id)->where('is_paid', 1)->sum('amount');
     }
 
     public function customertypes()

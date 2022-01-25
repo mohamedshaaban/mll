@@ -89,6 +89,10 @@ class Orders extends Model
         {
             return trans('admin.Knet');
         }
+        elseif($this->attributes['payment_type'] == Orders::CHECK_PAYMENT)
+        {
+            return trans('admin.Check');
+        }
         return trans('admin.Cash');
     }
     public function getInvoiceIdAttribute()
