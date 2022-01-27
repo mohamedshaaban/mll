@@ -62,4 +62,14 @@ class OrdersController extends Controller
         return $text;
 
     }
+    public function checkCustmerOrder(Request $request)
+    {
+        $hasOrder = 0 ;
+        $order = Orders::where('is_paid',0)->where('customer_id',$request->id)->first();
+        if($order) {
+            $hasOrder = 1 ;
+        }
+        return ['hasorder'=>$hasOrder];
+
+    }
 }

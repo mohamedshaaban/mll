@@ -147,8 +147,25 @@ $('.not_exits_make-class').change(function() {
         $('.modelselect-class').parent().fadeIn();
     }
 });
-
-$( ".paymenttype-class" ).change(function() {
+ $(function(){
+    $('.customer_idclass').on('change', function() {
+        var data = $(".customer_idclass option:selected").val();
+        $.ajax
+        ({
+            type: "GET",
+            //url: "#",
+            url: "/check/customerorder/"+data,
+            success: function(data)
+            {
+               if(data.hasorder==1)
+               {
+                   alert('The chosen customer has an unpaid order');
+               }
+            }
+        });
+    })
+});
+ $( ".paymenttype-class" ).change(function() {
      if ($(this).val() == '2') {
           $('.paidpayment-class').parent().fadeOut();
          $('.chkreference').parent().fadeOut();

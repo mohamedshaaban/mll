@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\OrdersRequest as StoreRequest;
 
 // VALIDATION: change the requests to match your own file names if you need form validation
+use App\Http\Requests\Request;
 use App\Models\CarModel;
 use App\Models\Invoices;
 use App\Models\OrdersHistory;
@@ -503,20 +504,22 @@ class OrdersCrudController extends CrudController
         if(!$readonly) {
             CRUD::addField([  // Select2
                 'label' => trans('admin.Customer'),
-                'type' => 'relationship',
+                'type' => 'select2',
                 'name' => 'customer_id', // the db column for the foreign key
                 'entity' => 'customers', // the method that defines the relationship in your Model
                 'attribute' => 'mobile', // foreign key attribute that is shown to use
                 'tab' => 'Texts',
                 'data_source' => url("/admin/fetch/customer"), // url to controller search function (with /{id} should return model)
-
-                'inline_create' => [ // specify the entity in singular
-                    'include_all_form_fields' => false,
-                    'entity' => 'customers', // the entity in singular
-                    'force_select' => true, // should the inline-created entry be immediately selected?
-                    'include_main_form_fields' => ['car_plate_id'], // pass certain fields from the main form to the modal
-
-                ]
+                'attributes' => [
+                    'class' => 'customer_idclass',
+                ],
+//                'inline_create' => [ // specify the entity in singular
+//                    'include_all_form_fields' => false,
+//                    'entity' => 'customers', // the entity in singular
+//                    'force_select' => true, // should the inline-created entry be immediately selected?
+//                    'include_main_form_fields' => ['car_plate_id'], // pass certain fields from the main form to the modal
+//
+//                ]
             ]);
             CRUD::addField([  // Select2
                 'label' => trans('admin.Paid By'),
@@ -525,7 +528,9 @@ class OrdersCrudController extends CrudController
                 'entity' => 'paidby', // the method that defines the relationship in your Model
                 'attribute' => 'mobile', // foreign key attribute that is shown to user
                 'data_source' => url("/admin/fetch/customer"), // url to controller search function (with /{id} should return model)
-
+                'attributes' => [
+                    'class' => ' customer_id-class',
+                ],
                 'inline_create' => [ // specify the entity in singular
                     'include_all_form_fields' => false,
                     'entity' => 'customers', // the entity in singular
@@ -820,6 +825,9 @@ class OrdersCrudController extends CrudController
                 'entity' => 'customers', // the method that defines the relationship in your Model
                 'attribute' => 'mobile', // foreign key attribute that is shown to use
                 'tab' => 'Texts',
+                'attributes' => [
+                    'class' => ' customer_id-class',
+                ],
                 'data_source' => url("/admin/fetch/customer"), // url to controller search function (with /{id} should return model)
                 'attributes' => [
                     'disabled' => 'disabled',
@@ -839,8 +847,11 @@ class OrdersCrudController extends CrudController
                 'entity' => 'paidby', // the method that defines the relationship in your Model
                 'attribute' => 'mobile', // foreign key attribute that is shown to user
                 'data_source' => url("/admin/fetch/customer"), // url to controller search function (with /{id} should return model)
+
                 'attributes' => [
                     'disabled' => 'disabled',
+                    'class' => ' customer_id-class',
+
                 ],
                 'inline_create' => [ // specify the entity in singular
                     'include_all_form_fields' => false,
@@ -1286,5 +1297,6 @@ class OrdersCrudController extends CrudController
         }
         return $response;
     }
+
 
 }

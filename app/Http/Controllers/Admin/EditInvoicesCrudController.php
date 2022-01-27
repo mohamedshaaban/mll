@@ -254,7 +254,7 @@ class EditInvoicesCrudController extends CrudController
         }
         //End OF Get Total Amount of payment
         //Get Total Amount of Orders
-        dump($totalAmt);
+//        dump($totalAmt);
 
 
         foreach(($_REQUEST['orderId']) as $orderId){
