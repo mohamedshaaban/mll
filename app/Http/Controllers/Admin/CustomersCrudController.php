@@ -140,6 +140,26 @@ class CustomersCrudController extends CrudController
         return $data;
 
     }
+    public static function fetchCu(\Illuminate\Http\Request  $request)
+    {
+        $customers = Customers::where('name','like','%'.$request->q.'%')->orWhere('mobile','like','%'.$request->q.'%')->paginate(11);
+        $data = [] ;
+        foreach ($customers as $customer)
+        {
+            if($customer->name)
+            {
+                $data[] = [$customer->id =>$customer->name.' - '.$customer->mobile];
+            }
+            else
+            {
+                $data[$customer->id] =  $customer->mobile;
+
+            }
+        }
+
+        return $customers;
+
+    }
     public static function filter(\Illuminate\Http\Request  $request)
     {
         $customers = Customers::where('name','like','%'.$request->q.'%')->orWhere('mobile','like','%'.$request->q.'%')->get(['id','name','mobile']);

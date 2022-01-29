@@ -502,9 +502,19 @@ class OrdersCrudController extends CrudController
         $this->crud->addButtonFromModelFunction('line', 'share ', 'openGoogle', 'beginning');
 
         if(!$readonly) {
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'custom-ajax-button',
+                    'type' => 'view',
+                    'view' => 'orders.create-customer',
+                    'tab' => 'Texts',
+
+                ]);
             CRUD::addField([  // Select2
                 'label' => trans('admin.Customer'),
-                'type' => 'select2',
+                'placeholder' => trans('admin.Customer'),
+                'minimum_input_length' => 8,
+                'type' => 'select2_from_ajax',
                 'name' => 'customer_id', // the db column for the foreign key
                 'entity' => 'customers', // the method that defines the relationship in your Model
                 'attribute' => 'mobile', // foreign key attribute that is shown to use
@@ -521,6 +531,7 @@ class OrdersCrudController extends CrudController
 //
 //                ]
             ]);
+
             CRUD::addField([  // Select2
                 'label' => trans('admin.Paid By'),
                 'type' => 'relationship',
@@ -805,8 +816,16 @@ class OrdersCrudController extends CrudController
                     'class' => 'form-control some-class',
                     'readonly' => 'readonly',
                 ],
-
+                
             ]);
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'custom-ajax-button',
+                    'type' => 'view',
+                    'view' => 'orders.custom-order-history',
+                    'tab' => 'Texts',
+
+                ]);
             CRUD::addField(  // Text
                 [   // view
                     'name' => 'custom-ajax-button',

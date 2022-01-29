@@ -22,7 +22,7 @@ class Invoices extends Model
     protected $table = 'invoices';
     protected $primaryKey = 'id';
     protected $appends = ['linktocopy','paid','share_link'];
-    protected $fillable = ['is_paid', 'url','date_from','date_to','customer_id','xero_id','invoice_unique_id','payments'];
+    protected $fillable = ['is_paid', 'url','date_from','date_to','customer_id','xero_id','invoice_unique_id','payments','disount'];
     public function orders()
     {
         return $this->belongsToMany(Orders::class, 'order_invoices');

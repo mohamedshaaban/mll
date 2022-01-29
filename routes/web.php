@@ -22,6 +22,7 @@ Route::get('/pay/{token}/{staus}/{payment}', 'PaymentController@payReturn')->nam
 Route::get('/pay/invoice/{id}', 'PaymentController@payInvoice')->name('payInvoice');
 Route::get('/share/order/{id}', 'OrdersController@shareOrder')->name('shareOrder');
 Route::get('/check/customerorder/{id}', 'OrdersController@checkCustmerOrder')->name('checkCustmerOrder');
+Route::get('/chk/invoice/{id}', 'OrdersController@checkInvoice')->name('checkInvoice');
 Route::get('/copy/order/{id}', 'OrdersController@copyOrder')->name('copyOrder');
 Route::get('/payxeroinvoice/{magiclink}', 'PaymentController@xeropdf')->name('xeropdf');
 Route::post('/pay', 'PaymentController@makePayment')->name('makePayment');

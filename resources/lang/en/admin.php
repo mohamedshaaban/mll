@@ -187,8 +187,8 @@ return array(
     'Url'=>'Url',
     'invoice_unique_id'=>'invoice id',
 
-    ''=>'',
-    ''=>'',
+    'discount'=>'discount',
+    'Delete'=>'Delete',
     ''=>'',
     ''=>'',
     ''=>'',

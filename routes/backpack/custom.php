@@ -52,6 +52,7 @@ Route::group([
     Route::get('fetch/carmodel', 'CarModelCrudController@fetch');
     Route::post('fetch/car', 'CarsCrudController@fetch');
     Route::post('fetch/customer', 'CustomersCrudController@fetch');
+    Route::get('fetch/customer', 'CustomersCrudController@fetchCu');
     Route::post('fetch/driver', 'CustomersCrudController@driver');
 
     //Filter Fetch

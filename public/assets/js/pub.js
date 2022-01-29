@@ -182,3 +182,24 @@ $('.not_exits_make-class').change(function() {
         $('.paidpayment-class').parent().fadeIn();
     }
 });
+function delete_invoice(invId)
+{
+    if (confirm("Are you sure to delete this invoice?!")) {
+        $.ajax
+        ({
+            type: "GET",
+            //url: "#",
+            url: "/chk/invoice/"+invId,
+            success: function(data)
+            {
+               alert(data.message);
+               if(data.deleted == 1 )
+               {
+                   $('#inv'+invId).hide();
+               }
+            }
+        });
+    } else {
+
+    }
+}

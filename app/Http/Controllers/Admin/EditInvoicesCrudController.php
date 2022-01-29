@@ -191,6 +191,13 @@ class EditInvoicesCrudController extends CrudController
             ]);
         CRUD::addField(  // Text
             [   // view
+                'name' => 'disount',
+                'label' => trans('admin.discount'),
+                'type' => 'number',
+                 'tab' => 'Texts',
+            ]);
+        CRUD::addField(  // Text
+            [   // view
                 'name' => 'custom-ajax-button',
                 'type' => 'view',
                 'view' => ('orders.custom-invoices'),
@@ -254,13 +261,15 @@ class EditInvoicesCrudController extends CrudController
         }
         //End OF Get Total Amount of payment
         //Get Total Amount of Orders
-//        dump($totalAmt);
-
-
         foreach(($_REQUEST['orderId']) as $orderId){
             $order = Orders::find($orderId);
             $totalOrderAmt += $order->amount - $order->discount;
 
+        }
+        //Discount Cant be greater than total orders
+        if($_REQUEST['disount'] > $totalOrderAmt)
+        {
+            return \Redirect::back()->withErrors(['Discount Cant be greater than total of orders']);
         }
         //Total PAyment Cant be greater than total orders
         if($totalAmt > $totalOrderAmt)
@@ -268,11 +277,23 @@ class EditInvoicesCrudController extends CrudController
             return \Redirect::back()->withErrors(['Total Payment Cant be greater than total of orders']);
         }
 
+
         //End OF Get Total Amount of Orders
 
         $previousInvoice = Invoices::find($_REQUEST['id']);
-        $previousOrders = $previousInvoice->orders;
+        $perviousOrdersIds = [] ;
+        foreach($previousInvoice->orders as $order)
+        {
+            $perviousOrdersIds[] = $order->id;
+        }
 
+        $diffs = (array_diff($_REQUEST['orderId'], $perviousOrdersIds));
+        foreach ($diffs as $diff)
+        {
+            additemtoinvoice($diff);
+        }
+        dump($_REQUEST['orderId']);
+dd($perviousOrdersIds);
         $response = $this->traitUpdate();
 
         $newInvoice = Invoices::find($this->crud->entry->id);

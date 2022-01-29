@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoices;
+use App\Models\OrderInvoicess;
 use App\Models\Orders;
 use App\Models\PaymentTransaction;
 use Backpack\NewsCRUD\app\Models\Article;
@@ -71,5 +72,45 @@ class OrdersController extends Controller
         }
         return ['hasorder'=>$hasOrder];
 
+    }
+    public function checkInvoice(Request $request)
+    {
+        $chkPayment = PaymentTransaction::where('invoice_id',$request->id)->first();
+        if(!$chkPayment)
+        {
+            $invoice = Invoices::with('orders')->whereId($request->id)->first();
+            foreach ($invoice->orders as $order)
+            {
+
+                $url = generateRandomString(10);
+                $order->url = $url;
+                $order->link_generated = 0;
+                $order->payment_link = url('/') . '/payorder/' . $url;
+                $order->save();
+                $order->save();
+                if ($order->amount == 0 || $order->amount == NULL) {
+                    try {
+                        $xero =   xeroquotes($order->id, 1);
+                    } catch (\Exception $exception) {
+                    }
+                } else {
+                    try {
+                        $xero = xeroinvoice($order->id, 1);
+                    } catch (\Exception $exception) {
+                    }
+                }
+            }
+            deletexeroinvoice($invoice->id);
+            OrderInvoicess::where('invoices_id',$invoice->id)->delete();
+            $invoice->delete();
+            $deleted = 1 ;
+            $message = 'Invoice Deleted' ;
+        }
+        else
+        {
+            $deleted= 0 ;
+            $message = 'Cant Delete Invoice it has payments' ;
+        }
+        return ['message'=>$message,'deleted'=>$deleted];
     }
 }

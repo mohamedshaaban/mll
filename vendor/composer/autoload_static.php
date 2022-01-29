@@ -725,6 +725,7 @@ class ComposerStaticInitc22687eda6b58df163a3d90a016a016c
         'AddCommissionPaidDate' => __DIR__ . '/../..' . '/database/migrations/2021_09_06_070928_add_commission_paid_date.php',
         'AddCommissionTableOrder' => __DIR__ . '/../..' . '/database/migrations/2021_09_06_135026_add_commission_table_order.php',
         'AddDateFromToCustomerInvoicces' => __DIR__ . '/../..' . '/database/migrations/2021_08_26_132918_add_date_from_to_customer_invoicces.php',
+        'AddDiscountInvoice' => __DIR__ . '/../..' . '/database/migrations/2022_01_27_112334_add_discount_invoice.php',
         'AddDiscountOrdersTable' => __DIR__ . '/../..' . '/database/migrations/2022_01_10_124134_add_discount_orders_table.php',
         'AddFieldsUser' => __DIR__ . '/../..' . '/database/migrations/2021_08_21_135938_add_fields_user.php',
         'AddInvoiceIdPaymentTran' => __DIR__ . '/../..' . '/database/migrations/2021_09_02_130035_add_invoice_id_payment_tran.php',
