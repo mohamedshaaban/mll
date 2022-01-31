@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDiscountInvoice extends Migration
+class AddPaymentTypePaymentTransaction extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddDiscountInvoice extends Migration
      */
     public function up()
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->string('discount')->nullable();
+        Schema::table('payment_transaction', function (Blueprint $table) {
+            $table->string('payment_type')->default('knet');
         });
     }
 
@@ -25,7 +25,7 @@ class AddDiscountInvoice extends Migration
      */
     public function down()
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('payment_transaction', function (Blueprint $table) {
             //
         });
     }

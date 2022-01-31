@@ -7,6 +7,7 @@ use App\Http\Requests\CustomersRequest as StoreRequest;
 use App\Http\Requests\Request;
 use App\Models\Customers;
 use App\Models\Invoices;
+use App\Models\OrderInvoicess;
 use App\Models\Orders;
 use App\Models\PaymentTransaction;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
@@ -161,89 +162,181 @@ class EditInvoicesCrudController extends CrudController
     }
     protected function setupCreateOperation()
     {
+        session(['orders' => null]);
+        session(['canEdit' => true]);
+        session(['invoice' =>null]);
+        session(['payLink' =>null]);
+        session(['shareLink' =>null]);
+        session(['knetPayment' =>null]);
 
+        $canEditFields = true;
 //        $request->input('name');
         $id = (request()->route('id'));
         if($id) {
             $invoice = Invoices::with('orders')->whereId($id)->first();
+            if($invoice->is_paid){$canEditFields=false;}
              if($invoice) {
-                $orders = Orders::where('paid_by', $invoice->customer_id)->where('is_paid', Orders::ORDER_NOT_PAID)->where('status', Orders::COMPLETED_ORDER)->get();
+                 session(['payLink' =>$invoice->magic_link]);
+                 session(['shareLink' =>$invoice->share_edit_link]);
+
+                 $checkPayments = PaymentTransaction::where('invoice_id',$id)->first();
+                 $knetPayment = PaymentTransaction::where('invoice_id',$id)->where('status','CAPTURED')->get();
+                  if($checkPayments)
+                 {
+                     session(['canEdit' => false]);
+                 }
+                  session(['knetPayment' => $knetPayment]);
+                $orders = Orders::where('paid_by', $invoice->customer_id)
+                    ->where('is_paid', Orders::ORDER_NOT_PAID)->where('status', Orders::COMPLETED_ORDER)
+                    ->whereNotIn('id',OrderInvoicess::get()->pluck('orders_id')->toArray())->get();
+
                 session(['orders' => $orders]);
                 session(['invoice' => $invoice->orders]);
             }
         }
 //        CRUD::setValidation(StoreRequest::class);
-
-        CRUD::addField(  // Text
+        session(['canEditFields' =>$canEditFields]);
+        if($canEditFields){
+            CRUD::addField(  // Text
             [   // view
                 'name' => 'invoice_unique_id',
                 'label' => trans('admin.invoice_unique_id'),
                 'type' => 'text',
-                 'tab' => 'Texts',
-            ]);
-        CRUD::addField(  // Text
-            [   // view
-                'name' => 'url',
-                'label' => trans('admin.Url'),
-                'type' => 'text',
-                 'tab' => 'Texts',
-
-            ]);
-        CRUD::addField(  // Text
-            [   // view
-                'name' => 'disount',
-                'label' => trans('admin.discount'),
-                'type' => 'number',
-                 'tab' => 'Texts',
-            ]);
-        CRUD::addField(  // Text
-            [   // view
-                'name' => 'custom-ajax-button',
-                'type' => 'view',
-                'view' => ('orders.custom-invoices'),
                 'tab' => 'Texts',
 
             ]);
-        CRUD::addField([   // repeatable
-            'name'  => 'payments',
-            'label' => trans('admin.Payment'),
-            'type'  => 'repeatable',
-            'tab'   => 'Texts',
 
-            'fields' => [
-                [
-                    'name'    => 'transaction_id',
-                    'type'    => 'text',
-                    'label'   => trans('admin.transaction_id'),
-                    'wrapper' => ['class' => 'form-group col-md-4'],
-                ], [
-                    'name'    => 'amount',
-                    'type'    => 'text',
-                    'label'   => trans('admin.amount'),
-                    'wrapper' => ['class' => 'form-group col-md-4'],
-                ],[
-                    'name'    => 'date',
-                    'type'    => 'date',
-                    'label'   => trans('admin.date'),
-                    'wrapper' => ['class' => 'form-group col-md-4'],
-                ],[
-                    'name'    => 'payment_type',
-                    'type'    => 'select_from_array',
-                    'label'   => trans('admin.payment_type'),
-                    'wrapper' => ['class' => 'form-group col-md-4'],
-                    'options' => [
-                        // the key will be stored in the db, the value will be shown as label;
-                        Orders::CASH_PAYMENT => trans("admin.Cash"),
-                        Orders::CHECK_PAYMENT => trans("admin.Check"),
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'discount',
+                    'label' => trans('admin.discount'),
+                    'type' => 'number',
+                    'tab' => 'Texts',
+                ]);
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'custom-ajax-button',
+                    'type' => 'view',
+                    'view' => ('orders.custom-invoices'),
+                    'tab' => 'Texts',
+
+                ]);
+            CRUD::addField([   // repeatable
+                'name'  => 'payments',
+                'label' => trans('admin.Payment'),
+                'type'  => 'repeatable',
+                'tab'   => 'Texts',
+
+                'fields' => [
+                    [
+                        'name'    => 'transaction_id',
+                        'type'    => 'text',
+                        'label'   => trans('admin.transaction_id'),
+                        'wrapper' => ['class' => 'form-group col-md-4'],
+                    ], [
+                        'name'    => 'amount',
+                        'type'    => 'text',
+                        'label'   => trans('admin.amount'),
+                        'wrapper' => ['class' => 'form-group col-md-4'],
+                    ],[
+                        'name'    => 'date',
+                        'type'    => 'date',
+                        'label'   => trans('admin.date'),
+                        'wrapper' => ['class' => 'form-group col-md-4'],
+                    ],[
+                        'name'    => 'payment_type',
+                        'type'    => 'select_from_array',
+                        'label'   => trans('admin.payment_type'),
+                        'wrapper' => ['class' => 'form-group col-md-4'],
+                        'options' => [
+                            // the key will be stored in the db, the value will be shown as label;
+                            Orders::CASH_PAYMENT => trans("admin.Cash"),
+                            Orders::CHECK_PAYMENT => trans("admin.Check"),
+                        ],
                     ],
+
                 ],
 
-            ],
+                // optional
+                'new_item_label'  => 'Add Payment', // customize the text of the button
 
-            // optional
-            'new_item_label'  => 'Add Payment', // customize the text of the button
+            ],);
+        }
+        else {
+            $this->crud->removeSaveActions(['save_and_edit','save_and_back','save_and_new']);
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'invoice_unique_id',
+                    'label' => trans('admin.invoice_unique_id'),
+                    'type' => 'text',
+                    'tab' => 'Texts',
+                    'readonly' => 'readonly',
 
-        ],);
+                ]);
+
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'discount',
+                    'label' => trans('admin.discount'),
+                    'type' => 'number',
+                    'tab' => 'Texts',
+                    'readonly' => 'readonly',
+                ]);
+            CRUD::addField(  // Text
+                [   // view
+                    'name' => 'custom-ajax-button',
+                    'type' => 'view',
+                    'view' => ('orders.custom-invoices'),
+                    'tab' => 'Texts',
+                    'readonly' => 'readonly',
+
+                ]);
+            CRUD::addField([   // repeatable
+                'name'  => 'payments',
+                'label' => trans('admin.Payment'),
+                'type'  => 'repeatable',
+                'tab'   => 'Texts',
+                'readonly' => 'readonly',
+                'fields' => [
+                    [
+                        'name'    => 'transaction_id',
+                        'type'    => 'text',
+                        'readonly' => 'readonly',
+                        'label'   => trans('admin.transaction_id'),
+                        'wrapper' => ['class' => 'form-group col-md-4'],
+                    ], [
+                        'name'    => 'amount',
+                        'type'    => 'text',
+                        'readonly' => 'readonly',
+                        'label'   => trans('admin.amount'),
+                        'wrapper' => ['class' => 'form-group col-md-4'],
+                    ],[
+                        'name'    => 'date',
+                        'type'    => 'date',
+                        'readonly' => 'readonly',
+                        'label'   => trans('admin.date'),
+                        'wrapper' => ['class' => 'form-group col-md-4'],
+                    ],[
+                        'readonly' => 'readonly',
+                        'name'    => 'payment_type',
+                        'type'    => 'select_from_array',
+                        'label'   => trans('admin.payment_type'),
+                        'wrapper' => ['class' => 'form-group col-md-4'],
+                        'options' => [
+                            // the key will be stored in the db, the value will be shown as label;
+                            Orders::CASH_PAYMENT => trans("admin.Cash"),
+                            Orders::CHECK_PAYMENT => trans("admin.Check"),
+                        ],
+                    ],
+
+                ],
+
+                // optional
+                'new_item_label'  => 'Add Payment', // customize the text of the button
+
+            ],);
+
+        }
 
 
 
@@ -256,9 +349,17 @@ class EditInvoicesCrudController extends CrudController
         $totalPaidAmt  = 0 ;
         $totalOrderAmt  = 0 ;
         $totalAmt  = 0 ;
-        foreach(json_decode($_REQUEST['payments']) as $payment){
-            $totalAmt += $payment->amount;
+        if(sizeof($_REQUEST['orderId']) < 2)
+        {
+            return \Redirect::back()->withErrors(['# of orders must be greater than 1']);
         }
+        if($_REQUEST['payments']){
+        foreach(json_decode($_REQUEST['payments']) as $payment){
+            if($payment->amount)
+            {
+                $totalAmt += $payment->amount;
+            }
+        }}
         //End OF Get Total Amount of payment
         //Get Total Amount of Orders
         foreach(($_REQUEST['orderId']) as $orderId){
@@ -266,37 +367,124 @@ class EditInvoicesCrudController extends CrudController
             $totalOrderAmt += $order->amount - $order->discount;
 
         }
+        $previousInvoice = Invoices::find($_REQUEST['id']);
+
         //Discount Cant be greater than total orders
-        if($_REQUEST['disount'] > $totalOrderAmt)
+        $paymentsAmt = PaymentTransaction::where('invoice_id',$previousInvoice->id)->where('status','CAPTURED')->sum('amount');
+
+        if(isset($_REQUEST['discount'])&& ($_REQUEST['discount'] > $totalOrderAmt))
         {
             return \Redirect::back()->withErrors(['Discount Cant be greater than total of orders']);
+        }
+        if(isset($_REQUEST['discount'])&& ($_REQUEST['discount']+$paymentsAmt>$previousInvoice->amount))
+        {
+            return \Redirect::back()->withErrors(['Discount Cant be greater than remaining amount']);
         }
         //Total PAyment Cant be greater than total orders
         if($totalAmt > $totalOrderAmt)
         {
             return \Redirect::back()->withErrors(['Total Payment Cant be greater than total of orders']);
         }
+        //Total PAyment Cant be greater than total orders
+        if($totalAmt > $totalOrderAmt-($_REQUEST['discount']+$paymentsAmt))
+        {
+            return \Redirect::back()->withErrors(['Total Payment Cant be greater than the remaining amount of orders']);
+        }
 
 
         //End OF Get Total Amount of Orders
 
-        $previousInvoice = Invoices::find($_REQUEST['id']);
         $perviousOrdersIds = [] ;
         foreach($previousInvoice->orders as $order)
         {
             $perviousOrdersIds[] = $order->id;
         }
 
-        $diffs = (array_diff($_REQUEST['orderId'], $perviousOrdersIds));
-        foreach ($diffs as $diff)
-        {
-            additemtoinvoice($diff);
-        }
-        dump($_REQUEST['orderId']);
-dd($perviousOrdersIds);
+
         $response = $this->traitUpdate();
 
         $newInvoice = Invoices::find($this->crud->entry->id);
+        $diffs = (array_diff($_REQUEST['orderId'], $perviousOrdersIds));
+        //Delete pervious orders from invoice & add new ones
+        OrderInvoicess::where('invoices_id',$newInvoice->id)->delete();
+        foreach ($_REQUEST['orderId']as $orderId)
+        {
+            OrderInvoicess::create(['invoices_id'=>$newInvoice->id,'orders_id'=>$orderId]);
+        }
+        //Delete pervious orders from invoice & add new ones
+        (deletepaymentxero($newInvoice->id));
+
+        edititemtoinvoice($newInvoice->id);
+//Create Xeror order for the removed orders from invoice
+        foreach ($perviousOrdersIds as $diff)
+        {
+            if(!in_array($diff,$_REQUEST['orderId']))
+            {
+                $orderold = Orders::whereId($diff)->first();
+                $url = generateRandomString(10);
+                $orderold->url = $url;
+                $orderold->link_generated = 0;
+                $orderold->status = Orders::COMPLETED_ORDER;
+                $orderold->payment_link = url('/') . '/payorder/' . $url;
+                $orderold->save();
+                if ($orderold->amount == 0 || $orderold->amount == NULL) {
+                    try {
+                        $xero =   xeroquotes($orderold->id, 1);
+                    } catch (\Exception $exception) {
+                    }
+                } else {
+                    try {
+                        $xero = xeroinvoice($orderold->id, 1);
+                    } catch (\Exception $exception) {
+                    }
+                }
+            }
+        }
+
+        //Add Payments
+        if($_REQUEST['payments']){
+            PaymentTransaction::where('invoice_id')->where('payment_type','!=','knet')->delete();
+            foreach(json_decode($newInvoice->payments) as $payment){
+                if($payment->amount) {
+                    PaymentTransaction::create(
+                        ['order_id' => $newInvoice->id, 'transaction_id' => $payment->transaction_id,
+                            'refernece_number' => $payment->transaction_id
+                            , 'amount' => $payment->amount
+                            , 'status' => 'CAPTURED'
+                            , 'invoice_id' => $newInvoice->id
+                            , 'date' => Carbon::now()
+                            , 'payment_type' => ($payment->payment_type == 1) ? 'cash' : 'check'
+                            , 'response' => json_encode($payment)]);
+                }
+            }
+            foreach(PaymentTransaction::where('invoice_id',$newInvoice->id)->where('status','CAPTURED')->get() as $payment){
+                if($payment->amount && $payment->status=='CAPTURED')
+                {
+                    if($payment->payment_type == Orders::CASH_PAYMENT)
+                    {
+                        $acount = config('app.XEROCASH');
+                    }
+                    else if ($payment->payment_type == Orders::CHECK_PAYMENT)
+                    {
+                        $acount = config('app.XEROCHECK');
+                    }
+                    else
+                    {
+                        $acount = config('app.XEROKNET');
+                    }
+                    if($payment->amount)
+                    {
+                        (addpaymentinvoicexero( $newInvoice->id ,0 , $payment->amount , $acount,$payment->date));
+                    }
+                }
+            }}
+        $paymentsAmt = PaymentTransaction::where('invoice_id',$newInvoice->id)->where('status','CAPTURED')->sum('amount');
+
+        if($paymentsAmt >= ($newInvoice->amount-$newInvoice->discount) || ($newInvoice->amount <= $newInvoice->discount)||($paymentsAmt+$newInvoice->discount>=$newInvoice->amount))
+        {
+            $newInvoice->is_paid = 1 ;
+            $newInvoice->save();
+        }
         return $response;
 
     }

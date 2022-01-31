@@ -21,8 +21,8 @@ class Invoices extends Model
 
     protected $table = 'invoices';
     protected $primaryKey = 'id';
-    protected $appends = ['linktocopy','paid','share_link'];
-    protected $fillable = ['is_paid', 'url','date_from','date_to','customer_id','xero_id','invoice_unique_id','payments','disount'];
+    protected $appends = ['linktocopy','paid','share_link','share_edit_link'];
+    protected $fillable = ['is_paid', 'url','date_from','date_to','customer_id','xero_id','invoice_unique_id','payments','discount'];
     public function orders()
     {
         return $this->belongsToMany(Orders::class, 'order_invoices');
@@ -68,4 +68,17 @@ class Invoices extends Model
 
     }
 
+    public function getShareEditLinkAttribute($crud = false)
+    {
+        if($this->customers)
+        {
+            $text = '' ;
+            $text.= trans('admin.MLL EMERGENCY ROADSIDE ASSISTANCE').'%0A';
+            $text.= trans('admin.Invoice Id').' : '.$this->invoice_unique_id.'%0A';
+            $text.= trans('admin.Amount').' : '.@$this->amount.'%0A';
+            $text.= trans('admin.Pay_Link').' : '.@URL::to('/pay/invoice').'/'.$this->attributes['magic_link'].'%0A';
+            return 'https://wa.me/+965'.$this->customers->mobile.'/?text='.($text);
+        }
+
+    }
 }

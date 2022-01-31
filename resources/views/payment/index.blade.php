@@ -77,7 +77,8 @@
                                 <div class="row">
                                 <div class="col-md-6 col-sm-12 ">
                                     <div class="left-content">
-                                        <input type="number" name="amount" min="1" max="{{ $invoice->amount-$perviousAmount }}" value="{{ $invoice->amount-$perviousAmount }}" class="form-control">
+
+                                        <input type="number" name="amount" min="1" max="{{ ($invoice->amount-$invoice->discount)-$perviousAmount }}" value="{{ ($invoice->amount-$invoice->discount)-$perviousAmount  }}" class="form-control">
                                     </div>
                                     </div>
                                     <div class="col-md-6 col-sm-12 ">
@@ -103,7 +104,7 @@
                                 </div>
 
                                   <div class="col-md-4 py-3 px-5 text-right">
-                                    <div class="mb-2">Remaingin Amount</div>
+                                    <div class="mb-2">Remaining Amount</div>
 
                                     <div class="h2 font-weight-light">{{ number_format($invoice->amount-$perviousAmount,3) }} KD</div>
                                 </div>

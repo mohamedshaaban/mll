@@ -734,6 +734,7 @@ class ComposerStaticInitc22687eda6b58df163a3d90a016a016c
         'AddLinkGeneratedOrder' => __DIR__ . '/../..' . '/database/migrations/2021_08_28_215807_add_link_generated_order.php',
         'AddMagicLink' => __DIR__ . '/../..' . '/database/migrations/2021_08_28_210622_add_magic_link.php',
         'AddPartiallyPaidOrders' => __DIR__ . '/../..' . '/database/migrations/2021_09_12_135011_add_partially_paid_orders.php',
+        'AddPaymentTypePaymentTransaction' => __DIR__ . '/../..' . '/database/migrations/2022_01_30_002836_add_payment_type_payment_transaction.php',
         'AddPaymentsInvoicesTable' => __DIR__ . '/../..' . '/database/migrations/2022_01_17_125552_add_payments_invoices_table.php',
         'AddRemarksOrders' => __DIR__ . '/../..' . '/database/migrations/2021_10_28_145451_add_remarks_orders.php',
         'AddSlugToCategoriesTable' => __DIR__ . '/../..' . '/database/migrations/2016_07_24_060017_add_slug_to_categories_table.php',

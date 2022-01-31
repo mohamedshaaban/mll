@@ -29,7 +29,10 @@ window.Clipboard = (function(window, document, navigator) {
             textArea.select();
         }
     }
-
+    function hideAddPAy()
+    {
+        $('.canEditFields').hide();
+    }
     function copyToClipboard() {
 
         document.execCommand('copy');
@@ -159,8 +162,13 @@ $('.not_exits_make-class').change(function() {
             {
                if(data.hasorder==1)
                {
-                   alert('The chosen customer has an unpaid order');
-               }
+                   new Noty({
+                       type: "warning",
+                       text: data.ordersTxt,
+                       timeout     :70000,
+
+                   }).show();
+                }
             }
         });
     })
@@ -203,3 +211,4 @@ function delete_invoice(invId)
 
     }
 }
+$('.paidby').hide();

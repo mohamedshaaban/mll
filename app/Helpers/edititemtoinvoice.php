@@ -3,57 +3,23 @@
 use App\User;
 use TapPayments\GoSell;use App\Models\Orders;
 
-if ( ! function_exists( 'xeroinvoice' ) ) {
+if ( ! function_exists( 'edititemtoinvoice' ) ) {
     /**
      * Get Total Refunded Amount order
      * @param $id
      *
      * @return  float|integer
      */
-    function xeroinvoice( $data ,$isOrder) {
+    function edititemtoinvoice( $data ) {
         generatexerotoken();
 
         $lineItems = [] ;
-        if($isOrder)
-        {
-            $order = \App\Models\Orders::find($data);
-            $driver = User::where('id', $order->driver_id)->first();
-            $account = '200';
-            $account = isset($driver)? $driver->xero_revenue_account : '200' ;
-//            if(!$account)
-//            {
-//                $account  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
-//            }
-//            if($order->payment_type == Orders::KNET_PAYMENT)
-//            {
-//                $account = config('app.XEROKNET');
-//            }
 
-            $xero_unique = 'WBMll-'.$order->id.'-'.$order->customers->mobile;
-            if($order->areafrom)
+            $invoice = \App\Models\Invoices::find($data);
+            $xero_unique = $invoice->invoice_unique_id;
+            foreach ($invoice->orders as $order)
             {
-                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' , From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.', Phone :  '.@$order->customers->mobile.'  ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $account, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
-                if($order->discount && $order->discount!=0)
-                {
-                    $lineItems[] = [ "Description"=> 'Discount', "Quantity"=> "1", "UnitAmount"=> (-$order->discount), "AccountCode"=> config('app.XERODISCOUNT'), "TaxType"=> "NONE", "LineAmount"=> (-$order->discount) ];
-                }
-
-            }
-            else
-            {
-                $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount?$order->amount:0, "AccountCode"=> $account, "TaxType"=> "NONE", "LineAmount"=> $order->amount?$order->amount:0 ];
-                if($order->discount && $order->discount!=0) {
-                    $lineItems[] = ["Description" => 'Discount', "Quantity" => "1", "UnitAmount" => (-$order->discount), "AccountCode" => config('app.XERODISCOUNT'), "TaxType" => "NONE", "LineAmount" => (-$order->discount)];
-                }
-            }
-        }
-        else
-        {
-            $order = \App\Models\Invoices::find($data);
-            $xero_unique = $order->invoice_unique_id;
-            foreach ($order->orders as $order)
-            {
-            
+            voidxeroinvoice($order->id);
                 $driver = User::where('id', $order->driver_id)->first();
 //                $account = isset($driver)? $driver->xero_account : null ;
 //                if(!$account)
@@ -82,11 +48,13 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
                     }
                 }
             }
+        if($invoice->discount && $invoice->discount!=0) {
+            $lineItems[] = [ "Description"=> 'Discount', "Quantity"=> "1", "UnitAmount"=> (-$invoice->discount), "AccountCode"=> config('app.XERODISCOUNT'), "TaxType"=> "NONE", "LineAmount"=> (-$invoice->discount)];
         }
 
-        $curl = curl_init();
+          $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.xero.com/api.xro/2.0/Invoices/',
+            CURLOPT_URL => 'https://api.xero.com/api.xro/2.0/Invoices/'.$xero_unique,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -95,7 +63,7 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{ "Invoices": [ { "Type": "ACCREC", 
-            "Contact": { "Name": "'.$order->customers->mobile.' - '.$order->customers->name.'" },
+            "Contact": { "Name": "'.$invoice->customers->mobile.' - '.$invoice->customers->name.'" },
             "LineItems":  '.json_encode($lineItems).' ,
             "Date": "'.\Carbon\Carbon::today()->format('Y-m-d').'",
             "DueDate": "'.\Carbon\Carbon::today()->format('Y-m-d').'", 
@@ -111,31 +79,24 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
         ));
 
         $response = curl_exec($curl);
-
          curl_close($curl);
         $response = json_decode($response);
 
-        if(isset($response->Title) && $response->Title =='Unauthorized')
+         if(isset($response->Title) && $response->Title =='Unauthorized')
         {
             generatexerotoken();
-            return xeroinvoice( $data ,$isOrder);
+            return edititemtoinvoice( $data );
 
         }
-         if($isOrder)
-        {
-            
-             $order = \App\Models\Orders::find($data)->update(['xero_id'=>$response->Invoices[0]->InvoiceID]);
-        }
-        else
-        {
-            $invoice = \App\Models\Invoices::find($data);
-            foreach ($invoice->orders as $order)
-            {
-                $order->update(['xero_id'=>$response->Invoices[0]->InvoiceID]);
-            }
-            $invoice->update(['xero_id'=>$response->Invoices[0]->InvoiceID]);
+         try {
+             $invoice = \App\Models\Invoices::find($data);
+             foreach ($invoice->orders as $order) {
+//                 $order->update(['xero_id' => $response->Invoices[0]->InvoiceID]);
+             }
+             $invoice->update(['xero_id' => $response->Invoices[0]->InvoiceID]);
+         }
+         catch (Exception $ec){}
 
-        }
      }
 
 

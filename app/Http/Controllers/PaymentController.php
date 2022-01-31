@@ -67,11 +67,11 @@ class PaymentController extends Controller
                  $invoice->is_paid = 1;
                 $invoice->save();
             }
-            if($returns->status=='CAPTURED' )
+             if($returns->status=='CAPTURED' )
             {
                 try
                 {
-                    (addpaymentxero( $invoice->id ,0 , $returns->amount , config('app.XEROKNET')));
+                     (addpaymentxero( $invoice->id ,0 , $returns->amount , config('app.XEROKNET')));
                 }
                 catch (\Exception $exception){}
                 $transaction =  PaymentTransaction::create(

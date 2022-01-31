@@ -66,11 +66,18 @@ class OrdersController extends Controller
     public function checkCustmerOrder(Request $request)
     {
         $hasOrder = 0 ;
-        $order = Orders::where('is_paid',0)->where('customer_id',$request->id)->first();
-        if($order) {
+        $orders = Orders::where('is_paid',0)->where('customer_id',$request->id)->get();
+        $ordersTxt = '';
+        if(count($orders)>0) {
             $hasOrder = 1 ;
+            $ordersTxt = '<p style="color: #0b2e13;font-size: 16px;">This Customer has unpaid orders : </p>';
+
+            foreach ($orders as $order)
+            {
+                $ordersTxt .= '<a href="/admin/orders/'.$order->id.'/edit" target="_blank">'.$order->invoice_unique_id.'</a>,';
+            }
         }
-        return ['hasorder'=>$hasOrder];
+        return ['hasorder'=>$hasOrder,'ordersTxt'=>$ordersTxt];
 
     }
     public function checkInvoice(Request $request)
@@ -85,10 +92,10 @@ class OrdersController extends Controller
                 $url = generateRandomString(10);
                 $order->url = $url;
                 $order->link_generated = 0;
+                $order->status = Orders::COMPLETED_ORDER;
                 $order->payment_link = url('/') . '/payorder/' . $url;
                 $order->save();
-                $order->save();
-                if ($order->amount == 0 || $order->amount == NULL) {
+                 if ($order->amount == 0 || $order->amount == NULL) {
                     try {
                         $xero =   xeroquotes($order->id, 1);
                     } catch (\Exception $exception) {

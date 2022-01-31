@@ -26,6 +26,7 @@ return array(
     'AddLinkGeneratedOrder' => $baseDir . '/database/migrations/2021_08_28_215807_add_link_generated_order.php',
     'AddMagicLink' => $baseDir . '/database/migrations/2021_08_28_210622_add_magic_link.php',
     'AddPartiallyPaidOrders' => $baseDir . '/database/migrations/2021_09_12_135011_add_partially_paid_orders.php',
+    'AddPaymentTypePaymentTransaction' => $baseDir . '/database/migrations/2022_01_30_002836_add_payment_type_payment_transaction.php',
     'AddPaymentsInvoicesTable' => $baseDir . '/database/migrations/2022_01_17_125552_add_payments_invoices_table.php',
     'AddRemarksOrders' => $baseDir . '/database/migrations/2021_10_28_145451_add_remarks_orders.php',
     'AddSlugToCategoriesTable' => $baseDir . '/database/migrations/2016_07_24_060017_add_slug_to_categories_table.php',
