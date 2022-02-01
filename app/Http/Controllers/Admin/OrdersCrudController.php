@@ -701,7 +701,8 @@ class OrdersCrudController extends CrudController
                 'label' => trans('admin.discount'),
                 'type' => 'text',
                 'tab' => 'Texts',
-                'default' => 0
+                'default' => 0,
+                'attributes' => ['min'=>0],
 
 
             ]);
@@ -1062,6 +1063,8 @@ class OrdersCrudController extends CrudController
                 'default' => 0,
                 'attributes' => [
                     'disabled' => 'disabled',
+                    'min'=>0,
+
                 ],
 
             ]);

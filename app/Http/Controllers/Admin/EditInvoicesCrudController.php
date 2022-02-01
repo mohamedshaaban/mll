@@ -168,6 +168,7 @@ class EditInvoicesCrudController extends CrudController
         session(['payLink' =>null]);
         session(['shareLink' =>null]);
         session(['knetPayment' =>null]);
+        session(['hidedisc' =>0]);
 
         $canEditFields = true;
 //        $request->input('name');
@@ -177,6 +178,7 @@ class EditInvoicesCrudController extends CrudController
             if($invoice->is_paid){$canEditFields=false;}
              if($invoice) {
                  session(['payLink' =>$invoice->magic_link]);
+                 session(['hidedisc' =>$invoice->discount]);
                  session(['shareLink' =>$invoice->share_edit_link]);
 
                  $checkPayments = PaymentTransaction::where('invoice_id',$id)->first();
@@ -212,6 +214,7 @@ class EditInvoicesCrudController extends CrudController
                     'label' => trans('admin.discount'),
                     'type' => 'number',
                     'tab' => 'Texts',
+                    'attributes' => ['class' => 'form-control  dis-text','min'=>0],
                 ]);
             CRUD::addField(  // Text
                 [   // view
@@ -281,6 +284,7 @@ class EditInvoicesCrudController extends CrudController
                     'type' => 'number',
                     'tab' => 'Texts',
                     'readonly' => 'readonly',
+                    'attributes' => ['class' => 'form-control   dis-text','min'=>0],
                 ]);
             CRUD::addField(  // Text
                 [   // view
@@ -353,10 +357,12 @@ class EditInvoicesCrudController extends CrudController
         {
             return \Redirect::back()->withErrors(['# of orders must be greater than 1']);
         }
+        $transIds = [];
         if($_REQUEST['payments']){
         foreach(json_decode($_REQUEST['payments']) as $payment){
             if($payment->amount)
             {
+                $transIds[] = $payment->transaction_id;
                 $totalAmt += $payment->amount;
             }
         }}
@@ -370,13 +376,14 @@ class EditInvoicesCrudController extends CrudController
         $previousInvoice = Invoices::find($_REQUEST['id']);
 
         //Discount Cant be greater than total orders
-        $paymentsAmt = PaymentTransaction::where('invoice_id',$previousInvoice->id)->where('status','CAPTURED')->sum('amount');
+        $paymentsAmt = PaymentTransaction::where('invoice_id',$previousInvoice->id)->where('status','CAPTURED')
+            ->whereNotIn('transaction_id',$transIds)->sum('amount');
 
         if(isset($_REQUEST['discount'])&& ($_REQUEST['discount'] > $totalOrderAmt))
         {
             return \Redirect::back()->withErrors(['Discount Cant be greater than total of orders']);
         }
-        if(isset($_REQUEST['discount'])&& ($_REQUEST['discount']+$paymentsAmt>$previousInvoice->amount))
+        if(isset($_REQUEST['discount'])&&is_numeric($_REQUEST['discount'])&& (($_REQUEST['discount']+$paymentsAmt)>$totalOrderAmt))
         {
             return \Redirect::back()->withErrors(['Discount Cant be greater than remaining amount']);
         }
@@ -386,7 +393,8 @@ class EditInvoicesCrudController extends CrudController
             return \Redirect::back()->withErrors(['Total Payment Cant be greater than total of orders']);
         }
         //Total PAyment Cant be greater than total orders
-        if($totalAmt > $totalOrderAmt-($_REQUEST['discount']+$paymentsAmt))
+
+        if(isset($_REQUEST['discount'])&&is_numeric($_REQUEST['discount'])&& $totalAmt > $totalOrderAmt-($_REQUEST['discount']+$paymentsAmt))
         {
             return \Redirect::back()->withErrors(['Total Payment Cant be greater than the remaining amount of orders']);
         }
@@ -411,6 +419,8 @@ class EditInvoicesCrudController extends CrudController
         {
             OrderInvoicess::create(['invoices_id'=>$newInvoice->id,'orders_id'=>$orderId]);
         }
+        $newInvoice->amount = $totalOrderAmt;
+        $newInvoice->save();
         //Delete pervious orders from invoice & add new ones
         (deletepaymentxero($newInvoice->id));
 
@@ -442,8 +452,8 @@ class EditInvoicesCrudController extends CrudController
         }
 
         //Add Payments
+        PaymentTransaction::where('invoice_id')->where('payment_type','!=','knet')->delete();
         if($_REQUEST['payments']){
-            PaymentTransaction::where('invoice_id')->where('payment_type','!=','knet')->delete();
             foreach(json_decode($newInvoice->payments) as $payment){
                 if($payment->amount) {
                     PaymentTransaction::create(

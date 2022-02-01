@@ -131,7 +131,7 @@ if ( ! function_exists( 'xeroinvoice' ) ) {
             $invoice = \App\Models\Invoices::find($data);
             foreach ($invoice->orders as $order)
             {
-                $order->update(['xero_id'=>$response->Invoices[0]->InvoiceID]);
+//                $order->update(['xero_id'=>$response->Invoices[0]->InvoiceID]);
             }
             $invoice->update(['xero_id'=>$response->Invoices[0]->InvoiceID]);
 

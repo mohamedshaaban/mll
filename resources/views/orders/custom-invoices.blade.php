@@ -31,14 +31,29 @@
                 <th>
                     Date
                 </th>
+                <th>
+                    Amount
+                </th>
+                <th>
+                    Discount
+                </th>
+                <th>
+                    Total
+                </th>
             </tr>
         </thead>
 
         <tbody>
+        @php
+            $total= 0 ;
+        @endphp
         @foreach(session('invoice') as $order)
+            @php
+            $total+=$order->amount-$order->discont;
+            @endphp
             <tr>
                 <th>
-                    <input type="checkbox" @if(session('canEdit')==false) onclick="return false;" @endif  name="orderId[]" checked value="{{$order->id}}">
+                    <input type="checkbox" @if(session('canEdit')==false) onclick="return false;" @else onclick="return calcToal(this,{{$order->amount-$order->discont}})" @endif  data-value="{{ $order->amount-$order->discont }}" name="orderId[]" checked value="{{$order->id}}">
                 </th>
                 <th>
                     {{ $order->invoice_unique_id }}
@@ -55,12 +70,21 @@
                 <th>
                     {{ $order->date  }}
                 </th>
+                <th>
+                    {{ $order->amount  }}
+                </th>
+                <th>
+                    {{ $order->discont  }}
+                </th>
+                <th>
+                    {{ $order->amount-$order->discont  }}
+                </th>
             </tr>
         @endforeach
             @foreach(session('orders') as $order)
                 <tr>
                     <th>
-                        <input @if(session('canEdit')==false) onclick="return false;" @endif type="checkbox" name="orderId[]" value="{{$order->id}}">
+                        <input @if(session('canEdit')==false) onclick="return false;" @else onclick="return calcToal(this,{{$order->amount-$order->discont}})" @endif data-value="{{ $order->amount-$order->discont }}" type="checkbox" name="orderId[]" value="{{$order->id}}">
                     </th>
                     <th>
                         {{ $order->invoice_unique_id }}
@@ -77,8 +101,39 @@
                     <th>
                         {{ $order->date  }}
                     </th>
+                    <th>
+                        {{ $order->amount  }}
+                    </th>
+                    <th>
+                        {{ $order->discont  }}
+                    </th>
+                    <th>
+                        {{ $order->amount-$order->discont  }}
+                    </th>
                 </tr>
             @endforeach
+        <tr>
+            <th>
+                Total To be paid
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>
+            <th>
+                <p id="total">{{ $total  }}</p>
+            </th>
+        </tr>
         </tbody>
     </table>
 </div>
@@ -126,6 +181,8 @@
         </tbody>
     </table>
 </div>
+<input type="hidden" id="ttlhide" value="{{ $total }}"/>
+<input type="hidden" id="hidedisc" value="{{ session('hidedisc') }}"/>
 
 @if(session('canEditFields')==false)
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -135,6 +192,51 @@
                 $('.delete-element').hide();
                 $('.add-repeatable-element-button').hide();
             });
+
         </script>
 
 @endif
+
+<script>
+    function calcToal(pay,amt)
+    {
+        total = 0 ;
+        count = 0 ;
+        discount = $('.dis-text').val();
+        if(isNaN(discount)|| discount=='')
+        {
+            discount = 0;
+        }
+        $.each($("input[name='orderId[]']:checked"), function(){
+            count++;
+            total+=parseInt($(this).attr("data-value"));
+        });
+        if(count < 2)
+        {
+            alert('# of Orders cant be less than 2');
+            $(pay).prop('checked', true);
+            calcToal(pay,amt);
+        }
+
+        $('#total').html(total-parseInt(discount));
+    }
+    $(".dis-text").on('blur', function postinput() {
+        var matchvalue = $(this).val(); // this.value
+        total = 0 ;
+        $.each($("input[name='orderId[]']:checked"), function(){
+            total+=parseInt($(this).attr("data-value"));
+        });
+        if(matchvalue > total)
+        {
+            alert('Cant apply discount');
+            $(".dis-text").val($('#hidedisc').val());
+            $('#total').html(total-parseInt($('#hidedisc').val()));
+
+            return ;
+        }
+        else
+        {
+            $('#total').html(total-parseInt(matchvalue));
+        }
+    });
+</script>

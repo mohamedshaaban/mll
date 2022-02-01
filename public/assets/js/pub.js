@@ -34,7 +34,6 @@ window.Clipboard = (function(window, document, navigator) {
         $('.canEditFields').hide();
     }
     function copyToClipboard() {
-
         document.execCommand('copy');
         document.body.removeChild(textArea);
     }

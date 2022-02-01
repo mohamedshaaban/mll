@@ -130,13 +130,15 @@ class InvoicesCrudController extends CrudController
         $text .= '<tr role="row"><th data-orderable="false" style="width:30%">'.trans('admin.Invoice Id').'</th><th data-orderable="false" style="width:30%">'.trans('admin.Share').'</th><th data-orderable="false" style="width:30%">'.trans('admin.Invoice Link').'</th><th width="30%" data-orderable="false">'.trans('admin.Paid').' </th><th width="30%" data-orderable="false">'.trans('admin.Amount').'</th><th data-orderable="false">'.trans('admin.Remaining').'</th><th>'.trans('admin.Edit').'</th><th>'.trans('admin.Delete').'</th><th width="30%" data-orderable="false">'.trans('admin.Date').'</th></tr>';
         foreach ($invoices as $invoice)
         {
-            $lastTransacations = PaymentTransaction::where('invoice_id', $invoice->id)->get();
+            $lastTransacations = PaymentTransaction::where('invoice_id', $invoice->id)->where('status','CAPTURED')->get();
 
             $perviousAmount = 0 ;
             foreach ($lastTransacations as $lastTransacation)
             {
                 $perviousAmount+=$lastTransacation->amount;
             }
+
+            $perviousAmount+=$invoice->discount;
             $text.='<tr class="even" id="inv'.$invoice->id.'">';
             $text.= '<td><a href="/admin/editinvoices/'.$invoice->id.'/edit" class="btn btn-sm btn-link">'.@$invoice->invoice_unique_id.'</a></td>';
             $text.= '<td>'.@$invoice->share_link.'</td>';
