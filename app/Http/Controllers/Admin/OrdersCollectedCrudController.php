@@ -85,47 +85,49 @@ class OrdersCollectedCrudController extends CrudController
     protected function showDetailsRow($id)
     {
          $notPaidInvoices = Orders::where('driver_id',$id)->where(function ($query) {
-            $query->where('amount', '!=', 0)
+if((session('searchDateTo')))
+{
+            $query
                 ->whereBetween('date',[session('searchDateFrom'),session('searchDateTo')])
-                ->Where('amount', '!=', 'NULL');
+               ;}
         })->where('order_collected',0)->where('is_paid',1)->where('payment_type',Orders::CASH_PAYMENT)->get();
         $invoices = Orders::where('driver_id',$id)->where(function ($query) {
             $query->where('amount', '!=', 0)
                 ->Where('amount', '!=', 'NULL');
         })->where('order_collected',1)->where('is_paid',1)->where('payment_type',Orders::CASH_PAYMENT)->get();
         $text='';
-        $text.='<script>$("#selectorders'.$id.'").click(function (e) {$(this).closest("table").find("td input:checkbox").prop("checked", this.checked);});</script>';
+        $text.='<script>$("#selectorders'.$id.'").click(function (e) {$(this).closest("table").find("td input:checkbox").prop("checked", this.checked);recalccashdriver('.$id.');});</script>';
         $text .= '<div class="row"><div class="col-md-6 col-sm-12"><h3>'.trans('admin.Orders  With Driver').'</h3>';
         $text .= '<form acion="/admin/invoice/generate" method="get">';
         $text .= '<table class="bg-white table table-striped table-hover nowrap rounded shadow-xs border-xs mt-2 dataTable dtr-inline">';
-        $text .= '<tr role="row"><th data-orderable="false"><input type="checkbox" id="selectorders'.$id.'" /></th><th data-orderable="false">'.trans('admin.Order Id').'</th><th data-orderable="false">'.trans('admin.Date').'</th><th data-orderable="false">'.trans('admin.Amount').'</th></tr>';
+        $text .= '<tr role="row"><th data-orderable="false"><input class="cashwithdr'.$id.'" type="checkbox" id="selectorders'.$id.'" /></th><th data-orderable="false">'.trans('admin.Order Id').'</th><th data-orderable="false">'.trans('admin.Date').'</th><th data-orderable="false">'.trans('admin.Amount').'</th></tr>';
         $text .='    <input type="hidden" name="userid" value="'.$id.'" />';
         $notPaidInvoicesTotal = 0 ;
         $PaidInvoicesTotal = 0 ;
         foreach ($notPaidInvoices as $order)
         {
-            $notPaidInvoicesTotal+=$order->amount?$order->amount:0;
+            $notPaidInvoicesTotal+=($order->amount)-$order->discount;
             $text.='<tr class="even">';
-            $text.= '<td><input type="checkbox" name="orderid[]" class="orderchk'.$id.'" value="'.$order->id.'"/> </td>';
+            $text.= '<td><input type="checkbox" name="orderid[]" onclick="recalccashdriver('.$id.')" class="cashwithdr'.$id.' orderchk'.$id.'" value="'.$order->id.'"/> </td>';
             $text.= '<td>'.@$order->invoice_unique_id.'</td>';
             $text.= '<td>'.@$order->date.'</td>';
-            $text.= '<td>'.@$order->amount.'</td>';
+            $text.= '<td>'.($order->amount-$order->discount).'</td>';
             $text.='</tr>';
         }
-        $text.='<tr><td colspan="3">'.trans('admin.Total').' : </td><td colspan="1">'.$notPaidInvoicesTotal.'</td></tr>';
+        $text.='<tr><td>'.trans('admin.Total selected for driver cash').' : </td> <td id="select_driv_cas">0</td><td  >'.trans('admin.Total').' : </td><td  >'.$notPaidInvoicesTotal.'</td></tr>';
         $text.='</table><input type="submit" value="'.trans('admin.Collect Orders').'"></fom>';
         $text.='</div><div class="col-md-6 col-sm-12"><h3>'.trans('admin.Collected Orders').'</h3>';
         $text .= '<table class="bg-white table table-striped table-hover nowrap rounded shadow-xs border-xs mt-2 dataTable dtr-inline">';
         $text .= '<tr role="row"><th data-orderable="false"></th><th data-orderable="false">'.trans('admin.Order Id').'</th><th data-orderable="false">'.trans('admin.Date').'</th><th data-orderable="false">'.trans('admin.collected_date').'</th><th data-orderable="false">'.trans('admin.Amount').'</th></tr>';
         foreach ($invoices as $order)
         {
-            $PaidInvoicesTotal+=$order->amount;
+            $PaidInvoicesTotal+=$order->amount-$order->discount;
             $text.='<tr class="even">';
             $text.= '<td> </td>';
-            $text.= '<td>'.@$order->invoice_unique_id.'</td>';
+            $text.= '<td><a href="/admin/orders/'.@$order->id.'/edit" target="_blank">'.@$order->invoice_unique_id.'</a></td>';
             $text.= '<td>'.@$order->date.'</td>';
             $text.= '<td>'.@$order->collected_date.'</td>';
-            $text.= '<td>'.@$order->amount.'</td>';
+            $text.= '<td>'.@($order->amount-$order->discount).'</td>';
             $text.='</tr>';
         }
         $text.='<tr><td colspan="4">'.trans('admin.Total').' : </td><td colspan="1">'.$PaidInvoicesTotal.'</td></tr>';

@@ -79,7 +79,7 @@ if ( ! function_exists( 'generateinvoice' ) ) {
         }
         catch (\Exception $exception){}
         DB::raw('UNLOCK TABLES invoices WRITE');
-
+        return $invoice->id;
     }
     function generateRandomString($length = 10) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

@@ -51,12 +51,12 @@ class User extends Authenticatable
     }
     public function getCashwithdriverAttribute($key)
     {
-        return Orders::where('driver_id',$this->id)->where('payment_type',  Orders::CASH_PAYMENT)->where('order_collected',0)->where('is_paid',Orders::ORDER_PAID)->sum('amount');
+        return Orders::where('driver_id',$this->id)->where('payment_type',  Orders::CASH_PAYMENT)->where('order_collected',0)->where('is_paid',Orders::ORDER_PAID)->sum('amount')-Orders::where('driver_id',$this->id)->where('payment_type',  Orders::CASH_PAYMENT)->where('order_collected',0)->where('is_paid',Orders::ORDER_PAID)->sum('discount');
 
     }   
     public function getCashcollectedAttribute($key)
     {
-        return Orders::where('driver_id',$this->id)->where('payment_type',  Orders::CASH_PAYMENT)->where('order_collected',1)->where('is_paid',1)->sum('amount');
+        return Orders::where('driver_id',$this->id)->where('payment_type',  Orders::CASH_PAYMENT)->where('order_collected',1)->where('is_paid',1)->sum('amount') - Orders::where('driver_id',$this->id)->where('payment_type',  Orders::CASH_PAYMENT)->where('order_collected',1)->where('is_paid',1)->sum('discount');
 
     }
     public function getComissionAttribute($key)

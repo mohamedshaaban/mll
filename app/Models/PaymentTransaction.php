@@ -21,7 +21,7 @@ class PaymentTransaction extends Model
 
     protected $table = 'payment_transaction';
     protected $primaryKey = 'id';
-    protected $fillable = ['order_id', 'transaction_id','refernece_number','amount','status','date','response','invoice_id'];
+    protected $fillable = ['order_id', 'transaction_id','refernece_number','amount','status','date','response','invoice_id','payment_type'];
 
 
 }

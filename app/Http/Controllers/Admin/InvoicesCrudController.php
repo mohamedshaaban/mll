@@ -43,7 +43,10 @@ class InvoicesCrudController extends CrudController
             if (isset($queries['userid']) && isset($queries['orderid'])) {
                 if(sizeof($queries['orderid'])>1)
                 {
-                    (generateInvoice($queries));
+                    $id = (generateInvoice($queries));
+                    header('Location: /admin/editinvoices/'.$id.'/edit');
+                    die;
+//                    return redirect('/admin/member/'.$id.'/show');
                 }
                 else
                 {
@@ -79,12 +82,12 @@ class InvoicesCrudController extends CrudController
         ]);
         $this->crud->addColumn([ // Text
             'name'  => 'num_paid_of_orders',
-            'label' => trans('admin.# Paid Knet Orders'),
+            'label' => trans('admin.# Paid Orders'),
             'type'      => 'text'
         ]);
         $this->crud->addColumn([ // Text
             'name'  => 'amt_of_orders',
-            'label' => trans('admin.Amount Paid knet Orders'),
+            'label' => trans('admin.Amount Paid Orders'),
             'type'      => 'text'
         ]);        
         
@@ -130,22 +133,28 @@ class InvoicesCrudController extends CrudController
         $text .= '<tr role="row"><th data-orderable="false" style="width:30%">'.trans('admin.Invoice Id').'</th><th data-orderable="false" style="width:30%">'.trans('admin.Share').'</th><th data-orderable="false" style="width:30%">'.trans('admin.Invoice Link').'</th><th width="30%" data-orderable="false">'.trans('admin.Paid').' </th><th width="30%" data-orderable="false">'.trans('admin.Amount').'</th><th data-orderable="false">'.trans('admin.Remaining').'</th><th>'.trans('admin.Edit').'</th><th>'.trans('admin.Delete').'</th><th width="30%" data-orderable="false">'.trans('admin.Date').'</th></tr>';
         foreach ($invoices as $invoice)
         {
-            $lastTransacations = PaymentTransaction::where('invoice_id', $invoice->id)->where('status','CAPTURED')->get();
-
+            $orderDiscounts = 0 ;
+            foreach ($invoice->orders as $order)
+            {
+                $orderDiscounts+=$order->discount;
+            }
+            $lastTransacations = PaymentTransaction::where('invoice_id', $invoice->id)->where('status','CAPTURED')->groupBy('refernece_number')->get();
+//dump($lastTransacations);
             $perviousAmount = 0 ;
             foreach ($lastTransacations as $lastTransacation)
             {
                 $perviousAmount+=$lastTransacation->amount;
             }
+//            dump($perviousAmount);
 
-            $perviousAmount+=$invoice->discount;
+//            $perviousAmount+=$invoice->discount;
             $text.='<tr class="even" id="inv'.$invoice->id.'">';
             $text.= '<td><a href="/admin/editinvoices/'.$invoice->id.'/edit" class="btn btn-sm btn-link">'.@$invoice->invoice_unique_id.'</a></td>';
             $text.= '<td>'.@$invoice->share_link.'</td>';
             $text.= '<td  style="width:30%"><a href="'.route('payInvoice',$invoice->magic_link).'" target="_blank" style="max-width:30%">'.trans('admin.Pay').'</a> </td>';
             $text.= '<td>'.@$invoice->paid.'</td>';
-            $text.= '<td>'.@$invoice->amount.'</td>';
-            $text.= '<td>'.abs($invoice->amount - $perviousAmount).'</td>';
+            $text.= '<td>'.@($invoice->amount-$invoice->discount).'</td>';
+            $text.= '<td>'.(($invoice->paid==1)? 0 : ($invoice->amount - $perviousAmount-$invoice->discount )).'</td>';
             $text.= '<td><a href="/admin/editinvoices/'.$invoice->id.'/edit" class="btn btn-sm btn-link"><i class="la la-edit"></i></a></td>';
             $text.= '<td><a onclick="delete_invoice('.$invoice->id.')" href="javascript:void(0)" class="btn btn-sm btn-link"><i class="la la-remove"></i></a></td>';
             $text.= '<td>'.@Carbon::parse($invoice->created_at)->format('Y-m-d').'</td>';
@@ -164,8 +173,8 @@ class InvoicesCrudController extends CrudController
         $id = (request()->route('id'));
         if($id) {
             $invoice = Invoices::with('orders')->whereId($id)->first();
-             if($invoice) {
-                $orders = Orders::where('paid_by', $invoice->customer_id)->where('is_paid', Orders::ORDER_NOT_PAID)->where('status', Orders::COMPLETED_ORDER)->get();
+              if($invoice) {
+                $orders = Orders::where('paid_by', $invoice->customer_id)->where('is_paid', Orders::ORDER_NOT_PAID)->where('link_generated',0)->where('status', Orders::COMPLETED_ORDER)->get();
                 session(['orders' => $orders]);
                 session(['invoice' => $invoice->orders]);
             }

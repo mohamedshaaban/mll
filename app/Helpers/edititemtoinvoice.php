@@ -52,9 +52,10 @@ if ( ! function_exists( 'edititemtoinvoice' ) ) {
             $lineItems[] = [ "Description"=> 'Discount', "Quantity"=> "1", "UnitAmount"=> (-$invoice->discount), "AccountCode"=> config('app.XERODISCOUNT'), "TaxType"=> "NONE", "LineAmount"=> (-$invoice->discount)];
         }
 
+
           $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.xero.com/api.xro/2.0/Invoices/'.$xero_unique,
+            CURLOPT_URL => 'https://api.xero.com/api.xro/2.0/Invoices/'.$invoice->xero_id,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -80,12 +81,12 @@ if ( ! function_exists( 'edititemtoinvoice' ) ) {
 
         $response = curl_exec($curl);
          curl_close($curl);
-        $response = json_decode($response);
 
+        $response = json_decode($response);
          if(isset($response->Title) && $response->Title =='Unauthorized')
         {
             generatexerotoken();
-            return edititemtoinvoice( $data );
+//            return edititemtoinvoice( $data );
 
         }
          try {

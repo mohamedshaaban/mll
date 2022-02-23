@@ -52,7 +52,7 @@ class Customers extends Model
     public function getNumPendingOfOrdersAttribute($value)
     {
         
-        return Orders::where('paid_by',$this->attributes['id'])->where('is_paid', '!=' ,1)->count();
+        return Orders::where('paid_by',$this->attributes['id'])->where('is_paid', '!=' ,1)->where('link_generated',0)->where('status',6)->count();
     }
     public function getNumPaidOfOrdersAttribute($value)
     {
@@ -62,7 +62,7 @@ class Customers extends Model
 
     public function getAmtPendingOfOrdersAttribute($value)
     {
-         return Orders::where('paid_by',$this->id)->where('is_paid', '!=' ,1)->where('status',6)->sum('amount');
+         return Orders::where('paid_by',$this->id)->where('is_paid', '!=' ,1)->where('status',6)->where('link_generated',0)->sum('amount');
     }
     public function getAmtOfOrdersAttribute($value)
     {

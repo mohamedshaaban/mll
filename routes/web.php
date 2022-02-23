@@ -18,11 +18,12 @@ Route::get('/xero/auth/callback', 'HomeController@xaerauth');
 //Route::get('tapreturn/{url}', 'PaymentController@tapreturn');
 //Route::get('tapinvoicereturn/{url}', 'PaymentController@tapinvoicereturn');
 
-Route::get('/pay/{token}/{staus}/{payment}', 'PaymentController@payReturn')->name('paySuccess');
+Route::any('/pay/{token}/{staus}/{payment}', 'PaymentController@payReturn')->name('paySuccess');
 Route::get('/pay/invoice/{id}', 'PaymentController@payInvoice')->name('payInvoice');
 Route::get('/share/order/{id}', 'OrdersController@shareOrder')->name('shareOrder');
 Route::get('/check/customerorder/{id}', 'OrdersController@checkCustmerOrder')->name('checkCustmerOrder');
 Route::get('/chk/invoice/{id}', 'OrdersController@checkInvoice')->name('checkInvoice');
+Route::get('/chk/order/{id}', 'OrdersController@checkOrder')->name('checkOrder');
 Route::get('/copy/order/{id}', 'OrdersController@copyOrder')->name('copyOrder');
 Route::get('/payxeroinvoice/{magiclink}', 'PaymentController@xeropdf')->name('xeropdf');
 Route::post('/pay', 'PaymentController@makePayment')->name('makePayment');

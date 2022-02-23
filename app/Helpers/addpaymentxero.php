@@ -36,8 +36,7 @@ if ( ! function_exists( 'addpaymentxero' ) ) {
             $order = \App\Models\Invoices::find($data);
         }
 
-
-        $curl = curl_init();
+         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://api.xero.com/api.xro/2.0/Payments',
             CURLOPT_RETURNTRANSFER => true,
@@ -61,6 +60,7 @@ if ( ! function_exists( 'addpaymentxero' ) ) {
 
         curl_close($curl);
         $response = json_decode($response);
+
         if(isset($response->Title) && $response->Title =='Unauthorized')
         {
             generatexerotoken();
@@ -94,8 +94,7 @@ if ( ! function_exists( 'addpaymentxero' ) ) {
             $order = \App\Models\Invoices::find($data);
         }
 
-
-        $curl = curl_init();
+         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://api.xero.com/api.xro/2.0/Payments',
             CURLOPT_RETURNTRANSFER => true,

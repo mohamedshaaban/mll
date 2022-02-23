@@ -23,7 +23,7 @@ if ( ! function_exists( 'xeroquotes' ) ) {
             {
                 $acccount  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
             }
-//
+ //
 //            if($order->payment_type == Orders::KNET_PAYMENT)
 //            {
 //                $account = config('app.XEROKNET');
@@ -149,6 +149,7 @@ if ( ! function_exists( 'xeroquotes' ) ) {
 
 
 
+
 }
 if ( ! function_exists( 'xeroquotestoinvoice' ) ) {
     /**
@@ -177,10 +178,18 @@ if ( ! function_exists( 'xeroquotestoinvoice' ) ) {
             if($order->areafrom)
             {
                 $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount, "AccountCode"=> $acccount, "TaxType"=> "NONE", "LineAmount"=> $order->amount ];
+                if($order->discount && $order->discount!=0)
+                {
+                    $lineItems[] = [ "Description"=> 'Discount', "Quantity"=> "1", "UnitAmount"=> (-$order->discount), "AccountCode"=> config('app.XERODISCOUNT'), "TaxType"=> "NONE", "LineAmount"=> (-$order->discount) ];
+                }
             }
             else
             {
                 $lineItems[] = [ "Description"=> '  Date:'.@$order->date.' ,  From : '. @$order->areafrom->name_en.' ,  To : '.@$order->areato->name_en.' ,  Driver : '.@$order->driver->name.',  Car Plate ID:'.@$order->cars->car_plate_id.',  Car Make:'.@$order->carmakes->name_en, "Quantity"=> "1", "UnitAmount"=> $order->amount, "AccountCode"=> $acccount, "TaxType"=> "NONE", "LineAmount"=> $order->amount ];
+                if($order->discount && $order->discount!=0)
+                {
+                    $lineItems[] = [ "Description"=> 'Discount', "Quantity"=> "1", "UnitAmount"=> (-$order->discount), "AccountCode"=> config('app.XERODISCOUNT'), "TaxType"=> "NONE", "LineAmount"=> (-$order->discount) ];
+                }
 
             }
             if( $order->amount < 1 ) {

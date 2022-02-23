@@ -12,8 +12,7 @@ class XeroController extends Controller
     public function index(Request $request, OauthCredentialManager $xeroCredentials)
     {
 
-        dd($xeroCredentials->getUser());
-            // Check if we've got any stored credentials
+             // Check if we've got any stored credentials
             if ($xeroCredentials->exists()) {
                 /*
                  * We have stored credentials so we can resolve the AccountingApi,

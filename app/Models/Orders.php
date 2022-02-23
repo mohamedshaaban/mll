@@ -47,6 +47,10 @@ class Orders extends Model
     {
         return $this->belongsTo(Customers::class, 'customer_id');
     }
+    public function customersname()
+    {
+        return $this->belongsTo(Customers::class, 'customer_id');
+    }
     public function paidby()
     {
         return $this->belongsTo(Customers::class, 'paid_by');

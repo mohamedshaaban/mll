@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        <title>MLL Emergency</title>
+        <meta property="og:image" content="https://static.wixstatic.com/media/2c5ec4_21257784eef543e089d184d91d4e9935~mv2.jpeg/v1/fill/w_500,h_500,al_c,q_80,usm_0.66_1.00_0.01/E684F110-9260-4980-9D09-CE9CF97A64C7.webp" />
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

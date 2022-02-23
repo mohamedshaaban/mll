@@ -125,7 +125,14 @@ class OrdersCrudController extends CrudController
             } catch (\Exception $exception) {
             }
         }
-
+        OrdersHistory::create([
+            'order_id' => $order->id,
+            'user_id' => backpack_user()->id,
+            'field' => '',
+            'old_value' => '',
+            'new_value' => '',
+            'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has created the order field ' . $order->invoice_unique_id
+        ]);
 
         return $response;
     }
@@ -150,6 +157,18 @@ class OrdersCrudController extends CrudController
             'orderLogic' => function ($query, $column, $columnDirection) {
                 return $query->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
                     ->orderBy('customers.mobile', $columnDirection)->select('orders.*');
+            }
+        ]);
+        $this->crud->addColumn([ // Text
+            'name' => 'customersname',
+            'label' => trans('admin.Customer Name'),
+            'type' => 'relationship',
+            'attribute' => 'name', // foreign key attribute that is shown to use
+
+            'orderable' => true,
+            'orderLogic' => function ($query, $column, $columnDirection) {
+                return $query->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
+                    ->orderBy('customers.name', $columnDirection)->select('orders.*');
             }
         ]);
 
@@ -293,19 +312,7 @@ class OrdersCrudController extends CrudController
             function($value) { // if the filter is active\
                 $this->crud->addClause('whereIn', 'driver_id', json_decode($value));
             });
-        $this->crud->addFilter([
-            'name'        => 'from_to',
-            'type'        => 'date_range',
-            'label'       => trans('admin.Date From To'),
-            'placeholder' => trans('admin.Pick a date')
-        ],
 
-            false,
-            function ($value) { // if the filter is active, apply these constraints
-                $dates = json_decode($value);
-                 $this->crud->addClause('where', 'date', '>=', $dates->from);
-                 $this->crud->addClause('where', 'date', '<=', $dates->to . ' 23:59:59');
-            });
         $this->crud->addFilter([
             'name'        => 'car_id',
             'type'        => 'select2_ajax',
@@ -397,16 +404,18 @@ class OrdersCrudController extends CrudController
             function($value) { // if the filter is active\
                 $this->crud->addClause('whereIn', 'is_paid', json_decode($value));
             });
-
         $this->crud->addFilter([
-            'name'        => 'date',
-            'type'        => 'date',
-            'label'       => trans('admin.Date'),
+            'name'        => 'from_to',
+            'type'        => 'date_range',
+            'label'       => trans('admin.Date From To'),
             'placeholder' => trans('admin.Pick a date')
         ],
+
             false,
             function ($value) { // if the filter is active, apply these constraints
-                $this->crud->addClause('where', 'date', 'like', '%'.$value.'%');
+                $dates = json_decode($value);
+                $this->crud->addClause('where', 'date', '>=', $dates->from);
+                $this->crud->addClause('where', 'date', '<=', $dates->to . ' 23:59:59');
             });
 //        $this->addCustomCrudFilters();
         $this->crud->addButtonFromModelFunction('line', 'share ', 'openGoogle', 'beginning');
@@ -420,10 +429,13 @@ class OrdersCrudController extends CrudController
 
     protected function setupUpdateOperation()
     {
+        session(['orderChanges'=>null]);
         $readonly = false;
 
         if ((request()->route('id'))) {
             $order = Orders::find(request()->route('id'));
+
+            session(['orderChanges'=>OrdersHistory::where('order_id',$order->id)->orderBy('id','DESC')->get()]);
             $orderCount = OrderInvoicess::where('orders_id',request()->route('id'))->first();
             if($order->is_paid || $order->partially_paid || $orderCount)
 
@@ -447,13 +459,15 @@ class OrdersCrudController extends CrudController
     }
     protected function setupCreateOperation()
     {
+        session(['orderChanges'=>null]);
 
         $readonly_ispaid = '';
         $readonly = false;
-        session(['orderChanges'=>null]);
-        $order = null;
+         $order = null;
         if ((request()->route('id'))) {
             $order = Orders::find(request()->route('id'));
+            session(['orderChanges'=>OrdersHistory::where('order_id',$order->id)->orderBy('id','DESC')->get()]);
+
             $orderCount = OrderInvoicess::where('orders_id',request()->route('id'))->first();
             if($order->is_paid || $order->partially_paid || $orderCount)
             {
@@ -468,7 +482,7 @@ class OrdersCrudController extends CrudController
         if($lastOrder)
         {
             $lastOrderId = $lastOrder->id;
-            session(['orderChanges'=>OrdersHistory::where('order_id',$lastOrderId)->orderBy('id','DESC')->get()]);
+
         }
         CRUD::setValidation(StoreRequest::class);
         if($readonly)
@@ -513,7 +527,7 @@ class OrdersCrudController extends CrudController
             CRUD::addField([  // Select2
                 'label' => trans('admin.Customer'),
                 'placeholder' => trans('admin.Customer'),
-                'minimum_input_length' => 8,
+                'minimum_input_length' => 2,
                 'type' => 'select2_from_ajax',
                 'name' => 'customer_id', // the db column for the foreign key
                 'entity' => 'customers', // the method that defines the relationship in your Model
@@ -563,18 +577,18 @@ class OrdersCrudController extends CrudController
 
 
             ]);
-            CRUD::addField([
-                'tab' => 'Texts',
-
-                'name' => 'crmnotexits',
-                'label' => trans('admin.Car Make not exists'),
-                'type' => 'boolean',
-                // optionally override the Yes/No texts
-                'options' => [1 => trans('admin.Yes')],
-                'attributes' => [
-                    'class' => ' not_exits_make-class',
-                ]
-            ]);
+//            CRUD::addField([
+//                'tab' => 'Texts',
+//
+//                'name' => 'crmnotexits',
+//                'label' => trans('admin.Car Make not exists'),
+//                'type' => 'boolean',
+//                // optionally override the Yes/No texts
+//                'options' => [1 => trans('admin.Yes')],
+//                'attributes' => [
+//                    'class' => ' not_exits_make-class',
+//                ]
+//            ]);
 
             CRUD::addField([  // Select2
                 'label' => trans('admin.Car Plate ID'),
@@ -819,22 +833,8 @@ class OrdersCrudController extends CrudController
                 ],
                 
             ]);
-            CRUD::addField(  // Text
-                [   // view
-                    'name' => 'custom-ajax-button',
-                    'type' => 'view',
-                    'view' => 'orders.custom-order-history',
-                    'tab' => 'Texts',
 
-                ]);
-            CRUD::addField(  // Text
-                [   // view
-                    'name' => 'custom-ajax-button',
-                    'type' => 'view',
-                    'view' => 'orders.custom-order-history',
-                    'tab' => 'Texts',
 
-                ]);
         }
         else
         {
@@ -896,20 +896,20 @@ class OrdersCrudController extends CrudController
                     'disabled' => 'disabled',
                 ],
             ]);
-            CRUD::addField([
-                'tab' => 'Texts',
-
-                'name' => 'crmnotexits',
-                'label' => trans('admin.Car Make not exists'),
-                'type' => 'boolean',
-                // optionally override the Yes/No texts
-                'options' => [1 => trans('admin.Yes')],
-                'attributes' => [
-                    'class' => ' not_exits_make-class',
-                    'disabled' => 'disabled',
-
-                ]
-            ]);
+//            CRUD::addField([
+//                'tab' => 'Texts',
+//
+//                'name' => 'crmnotexits',
+//                'label' => trans('admin.Car Make not exists'),
+//                'type' => 'boolean',
+//                // optionally override the Yes/No texts
+//                'options' => [1 => trans('admin.Yes')],
+//                'attributes' => [
+//                    'class' => ' not_exits_make-class',
+//                    'disabled' => 'disabled',
+//
+//                ]
+//            ]);
 
             CRUD::addField([  // Select2
                 'label' => trans('admin.Car Plate ID'),
@@ -1185,16 +1185,16 @@ class OrdersCrudController extends CrudController
                 ],
 
             ]);
-            CRUD::addField(  // Text
-                [   // view
-                    'name' => 'custom-ajax-button',
-                    'type' => 'view',
-                    'view' => ('orders.custom-order-history'),
-                    'tab' => 'Texts',
 
-                ]);
         }
+        CRUD::addField(  // Text
+            [   // view
+                'name' => 'custom-ajax-ordderhis-button',
+                'type' => 'view',
+                'view' => 'orders.custom-order-history',
+                'tab' => 'Texts',
 
+            ]);
         if($readonly)
         {
 
@@ -1244,6 +1244,10 @@ class OrdersCrudController extends CrudController
 //            $order->payment_link = '';
 //            $order->save();
 //        }
+
+
+
+
         if (!$order->paid_by) {
             $order->paid_by = $order->customer_id;
             $order->save();
@@ -1265,7 +1269,7 @@ class OrdersCrudController extends CrudController
             }
         }
 
-
+          (editxeroinvoice($order->id, 1));
 
         if ($order->is_paid) {
             if($order->payment_type == Orders::CASH_PAYMENT)
@@ -1291,15 +1295,16 @@ class OrdersCrudController extends CrudController
 //            {
 //                $account  = ($order->payment_type == Orders::KNET_PAYMENT) ? config('app.XEROKNET'): config('app.XEROCASH');
 //            }
-            try {
-                (addpaymentxero($order->id, 1, $order->amount, $account));
-            } catch (\Exception $ex) {
-            }
+//            try {
+//            dd($account);
+                 (addpaymentxero($order->id, 1, $order->amount- $order->discount, $account));
+//            } catch (\Exception $ex) {
+//            }
         }
         else
         {
             try {
-            xeroquotestoinvoice($order->id, 1);
+//            xeroquotestoinvoice($order->id, 1);
             } catch (\Exception $ex) {
             }
         }
@@ -1307,14 +1312,111 @@ class OrdersCrudController extends CrudController
         foreach ($changes as $key=>$change)
         {
             if(!in_array($key,['id','created_at','updated_at'])) {
-                OrdersHistory::create([
-                    'order_id' => $order->id,
-                    'user_id' => backpack_user()->id,
-                    'field' => $key,
-                    'old_value' => $previousOrder->$key,
-                    'new_value' => $change,
-                    'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->$key . ' to ' . $change
-                ]);
+                if($key == 'payment_type')
+                {
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->paymenttext . ' to ' . $order->paymenttext
+                    ]);
+                }
+                else if($key == 'area_from')
+                {
+                    $change = Areas::find($change);
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->areafrom->name_en . ' to ' . $change->name_en
+                    ]);
+                }
+                else if($key == 'area_to')
+                {
+                    $change = Areas::find($change);
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->areato->name_en . ' to ' . $change->name_en
+                    ]);
+                }
+                else if($key == 'driver_id')
+                {
+                    $change = User::find($change);
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->driver->name . ' to ' . $change->name
+                    ]);
+                }
+                else if($key == 'status')
+                {
+                    $change = RequestStatus::find($change);
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->requeststatus->name_en . ' to ' . $change->name
+                    ]);
+                }
+                else if($key == 'car_id')
+                {
+                    $change = Cars::find($change);
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->cars->car_plate_id . ' to ' . $change->car_plate_id
+                    ]);
+                }
+                else if($key == 'car_make')
+                {
+                    $change = CarMakes::find($change);
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->carmakes->name_en . ' to ' . $change->name_en
+                    ]);
+                }
+                else if($key == 'customer_id')
+                {
+                    $change = CarMakes::find($change);
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->customers->mobile . ' to ' . $order->customers->mobile
+                    ]);
+                }
+                else {
+                    OrdersHistory::create([
+                        'order_id' => $order->id,
+                        'user_id' => backpack_user()->id,
+                        'field' => $key,
+                        'old_value' => $previousOrder->$key,
+                        'new_value' => $change,
+                        'text' => Carbon::now() . ': User ' . backpack_user()->name . ' has modified field ' . $key . ' on order/invoice ' . $previousOrder->invoice_unique_id . ' from ' . $previousOrder->$key . ' to ' . $change
+                    ]);
+                }
             }
         }
         return $response;

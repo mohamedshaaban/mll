@@ -40,6 +40,9 @@
                                 <table class="table">
                                     <thead>
                                     <tr>
+                                        @php
+                                            $discount=$invoice->discount;
+                                        @endphp
                                         <th class="border-0 text-uppercase small font-weight-bold">ID</th>
                                         <th class="border-0 text-uppercase small font-weight-bold">Date</th>
                                         <th class="border-0 text-uppercase small font-weight-bold">Phone</th>
@@ -51,11 +54,16 @@
                                         <th class="border-0 text-uppercase small font-weight-bold">To</th>
 
 
+                                        <th class="border-0 text-uppercase small font-weight-bold">Amount</th>
+                                        <th class="border-0 text-uppercase small font-weight-bold">Discount</th>
                                         <th class="border-0 text-uppercase small font-weight-bold">Total</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach ($invoice->orders as $order  )
+                                        @php
+                                            $discount+=$order->discount;
+                                        @endphp
                                         <tr>
                                             <td>{{ $order->id }}</td>
                                             <td>{{ $order->date }}</td>
@@ -67,6 +75,8 @@
                                             <td>{{ @$order->areafrom->name_en }}</td>
                                             <td>{{ @$order->areato->name_en }}</td>
                                             <td>{{ number_format($order->amount,3) }} KD</td>
+                                            <td>{{ number_format($order->discount,3) }} KD</td>
+                                            <td>{{ number_format($order->amount-$order->discount,3) }} KD</td>
                                         </tr>
                                     @endforeach
                                     </tbody>
@@ -78,7 +88,7 @@
                                 <div class="col-md-6 col-sm-12 ">
                                     <div class="left-content">
 
-                                        <input type="number" name="amount" min="1" max="{{ ($invoice->amount-$invoice->discount)-$perviousAmount }}" value="{{ ($invoice->amount-$invoice->discount)-$perviousAmount  }}" class="form-control">
+                                        <input type="number" name="amount" min="1" step=".01" max="{{ ($invoice->amount-$invoice->discount)-$perviousAmount }}" value="{{ ($invoice->amount-$invoice->discount)-$perviousAmount  }}" class="form-control">
                                     </div>
                                     </div>
                                     <div class="col-md-6 col-sm-12 ">
@@ -99,14 +109,22 @@
 
                             <div class="col-md-12 d-flex flex-row-reverse bg-dark text-white p-4">
                                 <div class="py-3 px-5 text-right">
-                                    <div class="mb-2">Grand Total</div>
-                                    <div class="h2 font-weight-light">{{ number_format($invoice['amount']-($invoice['amount']*$invoice['discount']/100),3) }}KD</div>
-                                </div>
-
-                                  <div class="col-md-4 py-3 px-5 text-right">
                                     <div class="mb-2">Remaining Amount</div>
 
-                                    <div class="h2 font-weight-light">{{ number_format($invoice->amount-$perviousAmount,3) }} KD</div>
+                                    <div class="h2 font-weight-light">{{ number_format($invoice->amount-$perviousAmount-$invoice->discount,3) }} KD</div>
+                                </div>
+                                <div class="py-3 px-5 text-right">
+                                    <div class="mb-2">Paid</div>
+                                    <div class="h2 font-weight-light">{{ number_format($perviousAmount,3) }}KD</div>
+                                </div>
+                                <div class="py-3 px-5 text-right">
+                                    <div class="mb-2">Discount</div>
+                                    <div class="h2 font-weight-light">{{ number_format($invoice->discount,3) }}KD</div>
+                                </div>
+
+                                <div class="py-3 px-5 text-right">
+                                    <div class="mb-2">Grand Total</div>
+                                    <div class="h2 font-weight-light">{{ number_format(($invoice['amount']),3) }}KD</div>
                                 </div>
                             </div>  </div>
 

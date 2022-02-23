@@ -1,3 +1,4 @@
+@if(session('orderChanges'))
 Order Logs :
 <br />
 @foreach(session('orderChanges') as $change )
@@ -5,3 +6,4 @@ Order Logs :
     <span>{{ $change->text }}</span><br />
 @endif
 @endforeach
+@endif

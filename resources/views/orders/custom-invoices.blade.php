@@ -49,14 +49,14 @@
         @endphp
         @foreach(session('invoice') as $order)
             @php
-            $total+=$order->amount-$order->discont;
+            $total+=$order->amount-$order->discount;
             @endphp
             <tr>
                 <th>
-                    <input type="checkbox" @if(session('canEdit')==false) onclick="return false;" @else onclick="return calcToal(this,{{$order->amount-$order->discont}})" @endif  data-value="{{ $order->amount-$order->discont }}" name="orderId[]" checked value="{{$order->id}}">
+                    <input type="checkbox" @if(session('canEdit')==false) onclick="return false;" @else onclick="return calcToal(this,{{$order->amount-$order->discount}})" @endif  data-value="{{ $order->amount-$order->discount }}" name="orderId[]" checked value="{{$order->id}}">
                 </th>
                 <th>
-                    {{ $order->invoice_unique_id }}
+                    <a href="/admin/orders/{{@$order->id}}/edit" target="_blank">{{ $order->invoice_unique_id }}</a>
                 </th>
                 <th>
                     {{ @$order->areafrom->name }}
@@ -74,20 +74,20 @@
                     {{ $order->amount  }}
                 </th>
                 <th>
-                    {{ $order->discont  }}
+                    {{ $order->discount  }}
                 </th>
                 <th>
-                    {{ $order->amount-$order->discont  }}
+                    {{ $order->amount-$order->discount  }}
                 </th>
             </tr>
         @endforeach
             @foreach(session('orders') as $order)
                 <tr>
                     <th>
-                        <input @if(session('canEdit')==false) onclick="return false;" @else onclick="return calcToal(this,{{$order->amount-$order->discont}})" @endif data-value="{{ $order->amount-$order->discont }}" type="checkbox" name="orderId[]" value="{{$order->id}}">
+                        <input @if(session('canEdit')==false) onclick="return false;" @else onclick="return calcToal(this,{{$order->amount-$order->discount}})" @endif data-value="{{ $order->amount-$order->discount }}" type="checkbox" name="orderId[]" value="{{$order->id}}">
                     </th>
                     <th>
-                        {{ $order->invoice_unique_id }}
+                        <a href="/admin/orders/{{@$order->id}}/edit" target="_blank">{{ $order->invoice_unique_id }}</a>
                     </th>
                     <th>
                         {{ @$order->areafrom->name }}
@@ -105,10 +105,10 @@
                         {{ $order->amount  }}
                     </th>
                     <th>
-                        {{ $order->discont  }}
+                        {{ $order->discount  }}
                     </th>
                     <th>
-                        {{ $order->amount-$order->discont  }}
+                        {{ $order->amount-$order->discount  }}
                     </th>
                 </tr>
             @endforeach
@@ -131,7 +131,7 @@
             <th>
             </th>
             <th>
-                <p id="total">{{ $total  }}</p>
+                <p id="total">{{ $total-session('invoicediscount')  }}</p>
             </th>
         </tr>
         </tbody>

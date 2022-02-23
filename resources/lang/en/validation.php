@@ -51,7 +51,7 @@ return [
         'array'   => 'The :attribute may not have more than :max items.',
     ],
     'lte'   => [
-        'numeric' => 'The :attribute must be greater than amount.',
+        'numeric' => 'The :attribute must be less than amount.',
     ],
     'mimes' => 'The :attribute must be a file of type: :values.',
     'min'   => [

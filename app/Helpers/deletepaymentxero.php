@@ -22,7 +22,7 @@ if ( ! function_exists( 'deletepaymentxero' ) ) {
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.xero.com/api.xro/2.0/Invoices/'.$order->invoice_unique_id,
+            CURLOPT_URL => 'https://api.xero.com/api.xro/2.0/Invoices/'.$order->xero_id,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,

@@ -21,7 +21,7 @@ if ( ! function_exists( 'tappayment' ) ) {
 
         $charge = GoSell\Charges::create(
             [
-                "amount"=> $data['amount'],
+                "amount"=> $data['amount']-$data['discount'],
                 "currency"=> 'kwd',
                 "description"=> ':  نوع السيارة'.@$order->carmakes->name_en.': من   '. @$order->areafrom->name_en.' ,   : الي '.@$order->areato->name_en,
                 "threeDSecure"=> true,

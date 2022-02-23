@@ -203,7 +203,9 @@ function delete_invoice(invId)
                if(data.deleted == 1 )
                {
                    $('#inv'+invId).hide();
+                   location.reload();
                }
+
             }
         });
     } else {
@@ -211,3 +213,37 @@ function delete_invoice(invId)
     }
 }
 $('.paidby').hide();
+function recalccashdriver(id)
+{
+    var amt = 0 ;
+    var v= $('input[type=checkbox].cashwithdr'+id+':checked');
+    const ids = [];
+
+    $(v).each(function(i){
+        if($(this).val()!='on')
+        {
+            ids.push($(this).val());
+
+        }
+
+
+    });
+    $.ajax
+    ({
+        type: "GET",
+        //url: "#",
+        url: "/chk/order/"+ids,
+        success: function(data)
+        {
+            amt+=parseInt(data);
+        }
+    });
+    // alert(amt);
+    setTimeout(
+        function()
+        {
+            console.log(amt);
+            $('#select_driv_cas').html(amt);
+
+        }, 1000);
+}

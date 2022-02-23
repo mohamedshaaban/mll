@@ -105,7 +105,7 @@
                             <div class="col-md-12 d-flex flex-row-reverse bg-dark text-white p-4">
                                 <div class="py-3 px-5 text-right">
                                     <div class="mb-2">Grand Total</div>
-                                    <div class="h2 font-weight-light">{{ number_format($invoice['amount']-($invoice['amount']*$invoice['discount']/100),3) }}KD</div>
+                                    <div class="h2 font-weight-light">{{ number_format($invoice['amount']-($invoice['discount']),3) }}KD</div>
                                 </div>
 
                             </div>  </div>
@@ -171,6 +171,8 @@
                                         <th class="border-0 text-uppercase small font-weight-bold">To</th>
 
 
+                                        <th class="border-0 text-uppercase small font-weight-bold">Amount</th>
+                                        <th class="border-0 text-uppercase small font-weight-bold">Discount</th>
                                         <th class="border-0 text-uppercase small font-weight-bold">Total</th>
                                     </tr>
                                     </thead>
@@ -179,7 +181,9 @@
                                             <td>{{ $invoice->id }}</td>
                                             <td>{{ @$invoice->areafrom->name_em }}</td>
                                             <td>{{ @$invoice->areato->name_em }}</td>
+                                            <td>{{ number_format($invoice->discount,3) }} KD</td>
                                             <td>{{ number_format($invoice->amount,3) }} KD</td>
+
                                         </tr>
                                      </tbody>
                                 </table>

@@ -80,6 +80,17 @@ class OrdersController extends Controller
         return ['hasorder'=>$hasOrder,'ordersTxt'=>$ordersTxt];
 
     }
+    public function checkOrder(Request $request)
+    {
+        $amt = 0 ;
+        $orders = Orders::whereIn('id',explode(',',$request->id))->get();
+        foreach ($orders as $order)
+        {
+//            dump($order->amount.' - '.$order->discount);
+            $amt +=$order->amount-$order->discount;
+        }
+        return $amt;
+    }
     public function checkInvoice(Request $request)
     {
         $chkPayment = PaymentTransaction::where('invoice_id',$request->id)->first();

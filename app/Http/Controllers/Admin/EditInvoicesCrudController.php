@@ -42,6 +42,7 @@ class EditInvoicesCrudController extends CrudController
 
     protected function setupListOperation()
     {
+
         $queries = array();
         if(isset($_SERVER['QUERY_STRING'])) {
             parse_str($_SERVER['QUERY_STRING'], $queries);
@@ -92,7 +93,7 @@ class EditInvoicesCrudController extends CrudController
             'name'  => 'amt_of_orders',
             'label' => trans('admin.Amount Paid knet Orders'),
             'type'      => 'text'
-        ]);        
+        ]);
         
 
 
@@ -165,6 +166,7 @@ class EditInvoicesCrudController extends CrudController
         session(['orders' => null]);
         session(['canEdit' => true]);
         session(['invoice' =>null]);
+        session(['invoicediscount' =>0]);
         session(['payLink' =>null]);
         session(['shareLink' =>null]);
         session(['knetPayment' =>null]);
@@ -190,12 +192,15 @@ class EditInvoicesCrudController extends CrudController
                   session(['knetPayment' => $knetPayment]);
                 $orders = Orders::where('paid_by', $invoice->customer_id)
                     ->where('is_paid', Orders::ORDER_NOT_PAID)->where('status', Orders::COMPLETED_ORDER)
+                    ->where('link_generated', 0)
                     ->whereNotIn('id',OrderInvoicess::get()->pluck('orders_id')->toArray())->get();
 
                 session(['orders' => $orders]);
                 session(['invoice' => $invoice->orders]);
+                session(['invoicediscount' => $invoice->discount]);
             }
         }
+
 //        CRUD::setValidation(StoreRequest::class);
         session(['canEditFields' =>$canEditFields]);
         if($canEditFields){
@@ -214,7 +219,8 @@ class EditInvoicesCrudController extends CrudController
                     'label' => trans('admin.discount'),
                     'type' => 'number',
                     'tab' => 'Texts',
-                    'attributes' => ['class' => 'form-control  dis-text','min'=>0],
+                    'suffix'     => ".00",
+                    'attributes' => ['class' => 'form-control  dis-text','min'=>0,"step" => "any"],
                 ]);
             CRUD::addField(  // Text
                 [   // view
@@ -245,6 +251,7 @@ class EditInvoicesCrudController extends CrudController
                         'name'    => 'date',
                         'type'    => 'date',
                         'label'   => trans('admin.date'),
+                        'default' => Carbon::today()->format('Y-m-d'),
                         'wrapper' => ['class' => 'form-group col-md-4'],
                     ],[
                         'name'    => 'payment_type',
@@ -263,7 +270,7 @@ class EditInvoicesCrudController extends CrudController
                 // optional
                 'new_item_label'  => 'Add Payment', // customize the text of the button
 
-            ],);
+            ]);
         }
         else {
             $this->crud->removeSaveActions(['save_and_edit','save_and_back','save_and_new']);
@@ -319,6 +326,8 @@ class EditInvoicesCrudController extends CrudController
                         'type'    => 'date',
                         'readonly' => 'readonly',
                         'label'   => trans('admin.date'),
+
+                        'default'    => Carbon::today()->format('m/d/Y'),
                         'wrapper' => ['class' => 'form-group col-md-4'],
                     ],[
                         'readonly' => 'readonly',
@@ -370,6 +379,8 @@ class EditInvoicesCrudController extends CrudController
         //Get Total Amount of Orders
         foreach(($_REQUEST['orderId']) as $orderId){
             $order = Orders::find($orderId);
+            $order->link_generated =  1 ;
+            $order->save();
             $totalOrderAmt += $order->amount - $order->discount;
 
         }
@@ -423,7 +434,7 @@ class EditInvoicesCrudController extends CrudController
         $newInvoice->save();
         //Delete pervious orders from invoice & add new ones
         (deletepaymentxero($newInvoice->id));
-
+//dd($newInvoice->id);
         edititemtoinvoice($newInvoice->id);
 //Create Xeror order for the removed orders from invoice
         foreach ($perviousOrdersIds as $diff)
@@ -450,9 +461,8 @@ class EditInvoicesCrudController extends CrudController
                 }
             }
         }
-
         //Add Payments
-        PaymentTransaction::where('invoice_id')->where('payment_type','!=','knet')->delete();
+        PaymentTransaction::where('invoice_id', $newInvoice->id)->where('payment_type','!=','knet')->delete();
         if($_REQUEST['payments']){
             foreach(json_decode($newInvoice->payments) as $payment){
                 if($payment->amount) {
@@ -462,19 +472,20 @@ class EditInvoicesCrudController extends CrudController
                             , 'amount' => $payment->amount
                             , 'status' => 'CAPTURED'
                             , 'invoice_id' => $newInvoice->id
-                            , 'date' => Carbon::now()
+                            , 'date' => (isset($payment->date)&& $payment->date!='')? $payment->date :Carbon::now()
                             , 'payment_type' => ($payment->payment_type == 1) ? 'cash' : 'check'
                             , 'response' => json_encode($payment)]);
                 }
             }
             foreach(PaymentTransaction::where('invoice_id',$newInvoice->id)->where('status','CAPTURED')->get() as $payment){
+
                 if($payment->amount && $payment->status=='CAPTURED')
                 {
-                    if($payment->payment_type == Orders::CASH_PAYMENT)
+                    if($payment->payment_type == 'cash')
                     {
                         $acount = config('app.XEROCASH');
                     }
-                    else if ($payment->payment_type == Orders::CHECK_PAYMENT)
+                    else if ($payment->payment_type == 'check')
                     {
                         $acount = config('app.XEROCHECK');
                     }
@@ -482,13 +493,12 @@ class EditInvoicesCrudController extends CrudController
                     {
                         $acount = config('app.XEROKNET');
                     }
-                    if($payment->amount)
-                    {
-                        (addpaymentinvoicexero( $newInvoice->id ,0 , $payment->amount , $acount,$payment->date));
-                    }
+                         (addpaymentinvoicexero( $newInvoice->id ,0 , $payment->amount , $acount,$payment->date));
+
                 }
             }}
-        $paymentsAmt = PaymentTransaction::where('invoice_id',$newInvoice->id)->where('status','CAPTURED')->sum('amount');
+        $paymentsAmt = PaymentTransaction::where('invoice_id',$newInvoice->id)->where('status','CAPTURED')->groupBy('refernece_number')->get();
+        $paymentsAmt = $paymentsAmt->sum('amount');
 
         if($paymentsAmt >= ($newInvoice->amount-$newInvoice->discount) || ($newInvoice->amount <= $newInvoice->discount)||($paymentsAmt+$newInvoice->discount>=$newInvoice->amount))
         {
@@ -521,7 +531,7 @@ class EditInvoicesCrudController extends CrudController
 
 
         $response = $this->traitStore();
-        return $response;
+         return $response;
     }
 
 }
